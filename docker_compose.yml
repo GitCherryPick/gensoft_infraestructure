@@ -24,9 +24,5 @@ services:
     networks:
       - backend
 
-  api_gateway:
-    build: judiththth/gensoft_api:latest
-    container_name: gensoft_api
-    ports:
-      - "8002:8002"
+  
 
