@@ -1,10 +1,12 @@
+from flask import session
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from .base import Base
+from .institutions import Institution
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
@@ -13,3 +15,9 @@ class User(Base):
     status = Column(String(20), nullable=False)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
+
+    student_transfer_rel = relationship("StudentTransfer", back_populates="user_rel")
+
+    institucion = session.get(Institution, 1)
+    print(institucion.transfers_from)  # Lista de transferencias en las que esta institución es la de origen
+    print(institucion.transfers_to)    # Lista de transferencias en las que esta institución es la de destino
