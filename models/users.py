@@ -17,7 +17,3 @@ class User(Base):
     updated_at = Column(DateTime, nullable=False)
 
     student_transfer_rel = relationship("StudentTransfer", back_populates="user_rel")
-
-    institucion = session.get(Institution, 1)
-    print(institucion.transfers_from)  # Lista de transferencias en las que esta institución es la de origen
-    print(institucion.transfers_to)    # Lista de transferencias en las que esta institución es la de destino
