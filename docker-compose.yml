@@ -9,6 +9,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3307:3306"
+    networks:
+      - network_platform
 
   compiler_service:
     image: compiler_service:latest
@@ -17,7 +19,62 @@ services:
       - "8001:8001"
     environment:
       DATABASE_URL: "${DATABASE_URL}"
+    networks:
+      - network_platform
+
+  microservice_plagiarism_detection:
+    image: microservice_plagiarism_detection:latest
+    container_name: microservice_plagiarism_detection
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_URL: "${DATABASE_URL}"
+    networks:
+      - network_platform
+  
+  microservice_content_management:
+    image: microservice_content_management:latest
+    container_name: microservice_content_management
+    ports:
+      - "8003:8003"
+    environment:
+      DATABASE_URL: "${DATABASE_URL}"
+    networks:
+      - network_platform
+
+  microservice_email_notification:
+    image: microservice_email_notification:latest
+    container_name: microservice_email_notification
+    ports:
+      - "8004:8004"
+    environment:
+      DATABASE_URL: "${DATABASE_URL}"
+    networks:
+      - network_platform
+
+  microservice_ai_assistance:
+    image: microservice_ai_assistance:latest
+    container_name: microservice_ai_assistance
+    ports:
+      - "8005:8005"
+    environment:
+      DATABASE_URL: "${DATABASE_URL}"
+    networks:
+      - network_platform
+
+  microservice_user_management:
+    image: microservice_user_management:latest
+    container_name: microservice_user_management
+    ports:
+      - "8006:8006"
+    environment:
+      DATABASE_URL: "${DATABASE_URL}"
+    networks:
+      - network_platform
     
+networks:
+  network_platform:
+    driver: bridge
 
   
 
