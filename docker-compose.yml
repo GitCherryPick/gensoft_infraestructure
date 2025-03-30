@@ -4,10 +4,10 @@ services:
   mysql-db:
     image: mysql:8.0.41
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: user_db
-      MYSQL_USER: app_user      # Usuario específico para la aplicación
-      MYSQL_PASSWORD: app_pass  # Contraseña del usuario de aplicación
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}      # Usuario específico para la aplicación
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  # Contraseña del usuario de aplicación
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
@@ -27,11 +27,11 @@ services:
       mysql-db:
         condition: service_healthy
     environment:
-      DB_HOST: mysql-db
-      DB_PORT: 3306
-      DB_NAME: user_db
-      DB_USER: app_user      # Usa el usuario de aplicación
-      DB_PASSWORD: app_pass  # en lugar de root
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}      # Usa el usuario de aplicación
+      DB_PASSWORD: ${MYSQL_PASSWORD}  # en lugar de root
     restart: on-failure
     volumes:
       - .:/app              # Montar el código para desarrollo (opcional)
