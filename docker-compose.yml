@@ -36,5 +36,21 @@ services:
     volumes:
       - .:/app              # Montar el código para desarrollo (opcional)
 
+  user-management-service:
+    build: ./user-management-service
+    ports:
+      - "8006:8006"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}      # Usa el usuario de aplicación
+      DB_PASSWORD: ${MYSQL_PASSWORD}  # en lugar de root
+    restart: on-failure
+    volumes:
+      - .:/app 
 volumes:
   mysql_data:
