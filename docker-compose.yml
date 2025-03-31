@@ -51,6 +51,6 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD}  # en lugar de root
     restart: on-failure
     volumes:
-      - .:/app 
+      - .:/user-management-service:/app  # Montar el código para desarrollo (opcional) 
 volumes:
   mysql_data:

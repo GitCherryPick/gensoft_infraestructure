@@ -12,7 +12,7 @@ class StudentTransferCreate(BaseModel):
     from_institution: int
     to_institution: int
     transfer_date: datetime
-    progress_snapshot: dict | None = None
+    progress_snapshot: dict 
     status: TypesStatus
 
 class StudentTransferResponse(BaseModel):
@@ -21,7 +21,7 @@ class StudentTransferResponse(BaseModel):
     from_institution: int
     to_institution: int
     transfer_date: datetime
-    progress_snapshot: dict | None = None
+    progress_snapshot: dict
     status: TypesStatus
     
     class Config:

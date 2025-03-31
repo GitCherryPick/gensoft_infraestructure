@@ -1,8 +1,6 @@
-from flask import session
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from .base import Base
-from .institutions import Institution
 
 class User(Base):
     __tablename__ = "users"

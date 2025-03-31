@@ -4,7 +4,7 @@ class UserCreate(BaseModel):
     username: str
     email: str
     password: str
-    full_name: str | None = None
+    full_name: str 
 
 class UserResponse(BaseModel):
     id: int
@@ -14,4 +14,4 @@ class UserResponse(BaseModel):
     status: str
     created_at: str
     updated_at: str
-    last_login: str | None = None
+    last_login: str
