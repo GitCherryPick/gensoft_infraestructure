@@ -46,9 +46,6 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         password_hash=f"hashed_{user.password}",  # Use bcrypt in production
         full_name=user.full_name or "",
         status="active",
-        created_at= datetime.now(),
-        updated_at= datetime.now(),
-        last_login=None
     )
     db.add(db_user)
     db.commit()
@@ -57,14 +54,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/student_transfers", response_model=StudentTransferResponse)
 def create_student_transfer(transfer: StudentTransferCreate, db: Session = Depends(get_db)):
-    db_transfer = StudentTransfer(
-        user_id=transfer.user_id,
-        from_institution=transfer.from_institution,
-        to_institution=transfer.to_institution,
-        transfer_date=transfer.transfer_date,
-        progress_snapshot=transfer.progress_snapshot or {},
-        status=transfer.status,
-    )
+    db_transfer = StudentTransfer(**transfer.model_dump())
     db.add(db_transfer)
     db.commit()
     db.refresh(db_transfer)

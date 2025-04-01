@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from enum import Enum
+from typing import Optional, Dict
 
 class TypesStatus(str, Enum):
     PENDING = "pending"
@@ -11,8 +12,8 @@ class StudentTransferCreate(BaseModel):
     user_id: int
     from_institution: int
     to_institution: int
-    transfer_date: datetime
-    progress_snapshot: dict 
+    transfer_date: Optional[datetime]
+    progress_snapshot: Optional[Dict] 
     status: TypesStatus
 
 class StudentTransferResponse(BaseModel):
@@ -20,9 +21,6 @@ class StudentTransferResponse(BaseModel):
     user_id: int
     from_institution: int
     to_institution: int
-    transfer_date: datetime
-    progress_snapshot: dict
+    transfer_date: Optional[datetime]
+    progress_snapshot: Optional[Dict] 
     status: TypesStatus
-    
-    class Config:
-        orm_mode = True

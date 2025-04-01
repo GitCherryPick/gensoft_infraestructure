@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import JSON, Column, ForeignKey, Integer, Enum, DateTime
 from sqlalchemy.orm import relationship
 from .base import Base
@@ -14,7 +15,7 @@ class StudentTransfer(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     from_institution = Column(Integer, ForeignKey("institutions.id"), nullable=False)
     to_institution = Column(Integer, ForeignKey("institutions.id"), nullable=False)
-    transfer_date = Column(DateTime, nullable=False)
+    transfer_date = Column(DateTime, default=datetime.utcnow)
     progress_snapshot = Column(JSON, nullable=True)
     status = Column(Enum(TypesStatus), nullable=False)
 
