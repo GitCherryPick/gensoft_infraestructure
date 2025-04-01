@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from .base import Base
@@ -11,7 +12,7 @@ class User(Base):
     full_name = Column(String(100), nullable=True)
     last_login = Column(DateTime, nullable=True)
     status = Column(String(20), nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow ,nullable=False)
 
     student_transfer_rel = relationship("StudentTransfer", back_populates="user_rel")

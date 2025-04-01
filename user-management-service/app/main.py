@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -46,8 +46,8 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         password_hash=f"hashed_{user.password}",  # Use bcrypt in production
         full_name=user.full_name or "",
         status="active",
-        created_at= datetime.utcnow(),
-        updated_at= datetime.utcnow(),
+        created_at= datetime.now(),
+        updated_at= datetime.now(),
         last_login=None
     )
     db.add(db_user)
