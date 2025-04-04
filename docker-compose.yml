@@ -52,5 +52,72 @@ services:
     restart: on-failure
     volumes:
       - .:/user-management-service:/app  # Montar el código para desarrollo (opcional) 
+
+  plagiarism-detection-service:
+    build: ./plagiarism-detection-service
+    ports:
+      - "8002:8002"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}      # Usa el usuario de aplicación
+      DB_PASSWORD: ${MYSQL_PASSWORD}  # en lugar de root
+    restart: on-failure
+    volumes:
+      - .:/plagiarism-detection-service:/app  # Montar el código para desarrollo (opcional) 
+
+  email-notify-service:
+    build: ./email-notify-service
+    ports:
+      - "8004:8004"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}      # Usa el usuario de aplicación
+      DB_PASSWORD: ${MYSQL_PASSWORD}  # en lugar de root
+    restart: on-failure
+    volumes:
+      - .:/email-notify-service:/app  # Montar el código para desarrollo (opcional) 
+
+  ai-assistance-service:
+    build: ./ai-assistance-service
+    ports:
+      - "8005:8005"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}      # Usa el usuario de aplicación
+      DB_PASSWORD: ${MYSQL_PASSWORD}  # en lugar de root
+    restart: on-failure
+    volumes:
+      - .:/ai-assistance-service:/app  # Montar el código para desarrollo (opcional) 
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8010:8010"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      USER_MANAGEMENT_URL: http://user-management-service:8006
+      PLAGIARISM_DETECTION_URL: http://plagiarism-detection-service:8002
+      EMAIL_NOTIFY_URL: http://email-notify-service:8004
+      AI_ASSISTANCE_URL: http://ai-assistance-service:8005
+
+    restart: on-failure
+  
 volumes:
   mysql_data:
