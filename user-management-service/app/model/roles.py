@@ -12,7 +12,7 @@ class Role(Base):
     __tablename__ = "roles"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Enum(TypeRole), unique=True, nullable=False)
+    name = Column(Enum(TypeRole), unique=True, nullable=False)  ##duda unique
     description = Column(String(255), nullable=True)
     
     user_roles_rel = relationship("UserRoles", back_populates="role_rel")
