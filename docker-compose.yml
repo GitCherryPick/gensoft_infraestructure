@@ -70,6 +70,23 @@ services:
     volumes:
       - .:/plagiarism-detection-service:/app  # Montar el código para desarrollo (opcional) 
 
+  content-management-service:
+    build: ./content-management-service
+    ports:
+      - "8003:8003"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}      
+      DB_PASSWORD: ${MYSQL_PASSWORD}  
+    restart: on-failure
+    volumes:
+      - .:/content-management-service:/app  
+
   email-notify-service:
     build: ./email-notify-service
     ports:
