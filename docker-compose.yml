@@ -95,7 +95,7 @@ services:
     ports:
       - "8002:8002"
     depends_on:
-      mysql-db:
+      mysql-code-exec:
         condition: service_healthy
     environment:
       DB_HOST: ${CODE_DB_HOST}
@@ -112,7 +112,7 @@ services:
     ports:
       - "8003:8003"
     depends_on:
-      mysql-db:
+       mysql-content:
         condition: service_healthy
     environment:
       DB_HOST: ${CONTENT_DB_HOST}
@@ -129,7 +129,7 @@ services:
     ports:
       - "8005:8005"
     depends_on:
-      mysql-db:
+      mysql-ai:
         condition: service_healthy
     environment:
       DB_HOST: ${AI_DB_HOST}
