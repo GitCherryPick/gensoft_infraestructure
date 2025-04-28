@@ -5,7 +5,24 @@ Sprint 1 – Documentación de Desarrollo
 - Tecnologías: FastApi.
 
 2. Estructura de carpetas
-src/
+
+Microservicios (cada uno igual):
+microservice-name/
+  app/
+    api/
+    core/
+    model/
+    repositories/
+    schema/
+    services/
+    utils/
+    main.py
+    database.py
+  tests/            carpetas de tests específicas de este microservicio
+  Dockerfile
+  requirements.txt
+  alembic.ini
+  docker-compose.yml
 
 3. Convenciones de Git
 - Ramas principales:
@@ -23,6 +40,8 @@ src/
 5. Testing
 - Frameworks: 
 - Ubicación: junto a cada componente, archivo .test.tsx
+- Ubicación: cada microservicio tiene su carpeta `tests/` con tests unitarios y de integración
+
 
 6. CI/CD (GitHub Actions)
 - On push develop: build + test
