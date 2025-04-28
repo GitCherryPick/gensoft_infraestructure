@@ -1,0 +1,29 @@
+Sprint 1 – Documentación de Desarrollo
+
+1. Arquitectura
+- Patrón: S.O.L.I.D.
+- Tecnologías: FastApi.
+
+2. Estructura de carpetas
+src/
+
+3. Convenciones de Git
+- Ramas principales:
+  - main       Principal
+  - Sprint"Numero"    Desarrollo del sprint
+- Ramas de trabajo:
+  - feature/nombre-descriptivo
+  - bugfix/ticket-descripción
+  - hotfix/issue
+  - release/vX.Y.Z
+
+4. Estándares de código
+- Configuración en .eslintrc.js, .prettierrc
+
+5. Testing
+- Frameworks: 
+- Ubicación: junto a cada componente, archivo .test.tsx
+
+6. CI/CD (GitHub Actions)
+- On push develop: build + test
+- On push main: deploy a staging/producción
