@@ -1,48 +1,70 @@
 Sprint 1 – Documentación de Desarrollo
 
 1. Arquitectura
-- Patrón: S.O.L.I.D.
-- Tecnologías: FastApi.
+- Patrón de diseño: S.O.L.I.D.
+- Tecnologías principales: FastAPI, Python 3.11+, MySQL, Docker.
 
-2. Estructura de carpetas
+2. Estructura de Carpetas
 
-Microservicios (cada uno igual):
+Cada microservicio sigue esta estructura:
+
 microservice-name/
-  app/
-    api/
-    core/
-    model/
-    repositories/
-    schema/
-    services/
-    utils/
-    main.py
-    database.py
-  tests/            carpetas de tests específicas de este microservicio
-  Dockerfile
-  requirements.txt
-  alembic.ini
-  docker-compose.yml
+│
+├── app/
+│   ├── api/
+│   ├── core/
+│   ├── model/
+│   ├── repositories/
+│   ├── schema/
+│   ├── services/
+│   ├── utils/
+│   ├── main.py
+│   └── database.py
+│
+├── tests/                # Carpeta de pruebas unitarias e integración para el microservicio
+├── Dockerfile
+├── requirements.txt
+├── alembic.ini
+└── docker-compose.yml
 
 3. Convenciones de Git
+
 - Ramas principales:
-  - main       Principal
-  - Sprint"Numero"    Desarrollo del sprint
+  - main: Rama principal de producción.
+  - sprint/01 (o sprint/numero): Desarrollo activo del sprint correspondiente.
+
 - Ramas de trabajo:
   - feature/nombre-descriptivo
-  - bugfix/ticket-descripción
-  - hotfix/issue
+  - bugfix/nombre-descriptivo
+  - hotfix/nombre-descriptivo
   - release/vX.Y.Z
 
-4. Estándares de código
-- Configuración en .eslintrc.js, .prettierrc
+- Pull Requests (PR):
+  - Los PR deben ser creados hacia la rama sprint correspondiente, no hacia main directamente.
+
+4. Estándares de Código
+
+- Se sigue la guía de estilo de Python PEP8.
+- Se recomienda el uso de herramientas como `black` para formateo automático y `flake8` para linting.
+- Documentar funciones y clases usando docstrings estandarizados.
 
 5. Testing
-- Frameworks: 
-- Ubicación: junto a cada componente, archivo .test.tsx
-- Ubicación: cada microservicio tiene su carpeta `tests/` con tests unitarios y de integración
 
+- Frameworks utilizados:
+  - Pytest
+  - HTTPX (para pruebas de endpoints)
+
+- Ubicación de tests:
+  - Cada microservicio tiene su carpeta `tests/` para albergar pruebas unitarias y de integración.
+  - Cada archivo de test debe tener el sufijo `_test.py`.
 
 6. CI/CD (GitHub Actions)
+
 - On push develop: build + test
+
 - On push main: deploy a staging/producción
+
+
+Notas adicionales:
+- Mantener las dependencias actualizadas en `requirements.txt`.
+- Verificar que todos los servicios puedan ser levantados correctamente con `docker-compose up`.
