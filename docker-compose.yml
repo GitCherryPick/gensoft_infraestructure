@@ -1,23 +1,160 @@
+version: '3.8'
+
 services:
   mysql-db:
-    image: mysql:8
-    container_name: mysql-db
+    image: mysql:8.0.41
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      MYSQL_DATABASE: ${USER_DB_NAME}
+      MYSQL_USER: ${USER_DB_USER}     
+      MYSQL_PASSWORD: ${USER_DB_PASSWORD}  
+    volumes:
+      - mysql_user_data:/var/lib/mysql
     ports:
       - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-password"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    command: --default-authentication-plugin=mysql_native_password
 
-  compiler_service:
-    image: compiler_service:latest
-    container_name: compiler_service
-    ports:
-      - "8001:8001"
+  mysql-content:
+    image: mysql:8.0.41
     environment:
-      DATABASE_URL: "${DATABASE_URL}"
-    
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      MYSQL_DATABASE: ${CONTENT_DB_NAME}
+      MYSQL_USER: ${CONTENT_DB_USER}      
+      MYSQL_PASSWORD: ${CONTENT_DB_PASSWORD}  
+    volumes:
+      - mysql_content_data:/var/lib/mysql
+    ports:
+      - "3308:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-password"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    command: --default-authentication-plugin=mysql_native_password
 
+  mysql-ai:
+    image: mysql:8.0.41
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      MYSQL_DATABASE: ${AI_DB_NAME}
+      MYSQL_USER: ${AI_DB_USER}      
+      MYSQL_PASSWORD: ${AI_DB_PASSWORD}  
+    volumes:
+      - mysql_ai_data:/var/lib/mysql
+    ports:
+      - "3309:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-password"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    command: --default-authentication-plugin=mysql_native_password
+
+  mysql-code-exec:
+    image: mysql:8.0.41
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      MYSQL_DATABASE: ${CODE_DB_NAME}
+      MYSQL_USER: ${CODE_DB_USER}      
+      MYSQL_PASSWORD: ${CODE_DB_PASSWORD}  
+    volumes:
+      - mysql_code_exec_data:/var/lib/mysql
+    ports:
+      - "3310:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-password"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    command: --default-authentication-plugin=mysql_native_password
   
+  user-management-service:
+    build: ./user-management-service
+    ports:
+      - "8006:8006"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${USER_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${USER_DB_NAME}
+      DB_USER: ${USER_DB_USER}      # Usa el usuario de aplicación
+      DB_PASSWORD: ${USER_DB_PASSWORD}  # en lugar de root
+    restart: on-failure
+    volumes:
+      - .:/user-management-service:/app  # Montar el código para desarrollo (opcional) 
 
+  sandbox:
+    build: ./sandbox
+    ports:
+      - "8002:8002"
+    depends_on:
+      mysql-code-exec:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${CODE_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${CODE_DB_NAME}
+      DB_USER: ${CODE_DB_USER}      # Usa el usuario de aplicación
+      DB_PASSWORD: ${CODE_DB_PASSWORD}  # en lugar de root
+    restart: on-failure
+    volumes:
+      - .:/sandbox:/app  # Montar el código para desarrollo (opcional) 
+
+  content-management-service:
+    build: ./content-management-service
+    ports:
+      - "8003:8003"
+    depends_on:
+       mysql-content:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${CONTENT_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${CONTENT_DB_NAME}
+      DB_USER: ${CONTENT_DB_USER}
+      DB_PASSWORD: ${CONTENT_DB_PASSWORD}  
+    restart: on-failure
+    volumes:
+      - .:/content-management-service:/app  
+
+  ai-assistance-service:
+    build: ./ai-assistance-service
+    ports:
+      - "8005:8005"
+    depends_on:
+      mysql-ai:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${AI_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${AI_DB_NAME}
+      DB_USER: ${AI_DB_USER}    
+      DB_PASSWORD: ${AI_DB_PASSWORD} 
+    restart: on-failure
+    volumes:
+      - .:/ai-assistance-service:/app 
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8010:8010"
+    
+    environment:
+      USER_MANAGEMENT_URL: http://user-management-service:8006
+      SANDBOX_URL: http://sandbox:8002
+      AI_ASSISTANCE_URL: http://ai-assistance-service:8005
+      CONTENT_MANAGEMENT_URL: http://content-management-service:8003
+    restart: on-failure
+  
+volumes:
+  mysql_user_data:
+  mysql_content_data:
+  mysql_ai_data:
+  mysql_code_exec_data:
