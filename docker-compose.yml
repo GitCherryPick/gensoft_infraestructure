@@ -18,6 +18,8 @@ services:
       timeout: 10s
       retries: 10
     command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - test-network
 
   mysql-content:
     image: mysql:8.0.41
@@ -89,6 +91,25 @@ services:
     restart: on-failure
     volumes:
       - .:/user-management-service:/app  # Montar el código para desarrollo (opcional) 
+    networks:
+      - test-network
+
+  user-management-service-test:
+    build:
+      context: ./user-management-service
+    command: pytest tests --disable-warnings
+    depends_on:
+    - mysql-db
+    environment:
+      DB_HOST: ${USER_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${USER_DB_NAME}
+      DB_USER: ${USER_DB_USER}      # Usa el usuario de aplicación
+      DB_PASSWORD: ${USER_DB_PASSWORD}
+    volumes:
+      - ./user-management-service:/app
+    networks:
+      - test-network
 
   sandbox:
     build: ./sandbox
@@ -158,3 +179,7 @@ volumes:
   mysql_content_data:
   mysql_ai_data:
   mysql_code_exec_data:
+
+networks:
+  test-network:
+    driver: bridge
