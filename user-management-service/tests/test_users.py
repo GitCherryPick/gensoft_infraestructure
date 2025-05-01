@@ -7,7 +7,7 @@ client = TestClient(app)
 def test_basic_route():    
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "Welcome to User Management Service!"}
+    assert response.json() == {"message": "Welcome to User Management microservice!"}
     
 def test_not_found_route():
     response = client.get("/nonexistent")
@@ -16,8 +16,8 @@ def test_not_found_route():
 
 def test_create_user():
     user_data = {
-        "username": "testuser2",
-        "email": "testuser@example.com",
+        "username": "testuser3",
+        "email": "testuser3@example.com",
         "password": "testpassword",
         "full_name": "Test User"
     }
