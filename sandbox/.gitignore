@@ -16,3 +16,5 @@ debug.log
 
 migrations/
 alembic.ini
+
+temp_script.py
