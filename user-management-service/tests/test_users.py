@@ -3,6 +3,12 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
+user_data = {
+    "username": "testuser3",
+    "email": "testuser3@example.com",
+    "password": "testpassword",
+    "full_name": "Test User"
+}
 
 def test_basic_route():    
     response = client.get("/")
@@ -15,12 +21,6 @@ def test_not_found_route():
     assert response.json() == {"detail": "Not Found"}
 
 def test_create_user():
-    user_data = {
-        "username": "testuser3",
-        "email": "testuser3@example.com",
-        "password": "testpassword",
-        "full_name": "Test User"
-    }
     response = client.post("/users/", json=user_data)
     assert response.status_code == 200
     response_data = response.json()
@@ -28,3 +28,20 @@ def test_create_user():
     assert response_data["email"] == user_data["email"]
     assert response_data["full_name"] == user_data["full_name"]
     assert "id" in response_data
+
+def test_create_user():
+    user_new = {
+        "username": "testuser4",
+        "email": "testi@gmail.com",
+        "password": "testpassword",
+        "full_name": "Test User"
+    }
+    response = client.post("/users/", json=user_new)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["username"] == user_new["username"]
+
+def test_delete_user():
+    response = client.delete("/users/1")
+    assert response.status_code == 200
+    
