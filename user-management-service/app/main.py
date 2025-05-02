@@ -67,9 +67,9 @@ def get_student_transfer(transfer_id: int, db: Session = Depends(get_db)):
         return {"error": "student transfer not found"}
     return transfer
 
-@app.delete("/users/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
+@app.delete("/users/{user_username}")
+def delete_user(user_username: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == user_username).first()
     if user is None:
         return {"error": "user not found"}
     db.delete(user)
