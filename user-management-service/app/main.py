@@ -9,6 +9,7 @@ from app.schema.institutions import InstitutionCreate, InstitutionResponse
 from app.schema.student_transfers import StudentTransferCreate, StudentTransferResponse
 from app.api import institutions
 from app.model.base import Base
+from app.api import auth 
 import sys
 import os
 
@@ -19,7 +20,7 @@ app = FastAPI()
 
 app.include_router(institutions.router)
 Base.metadata.create_all(bind=engine)
-
+app.include_router(auth.router)
 def get_db():
     db = SessionLocal()
     try:

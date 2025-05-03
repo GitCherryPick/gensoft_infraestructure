@@ -7,3 +7,6 @@ cryptography
 httpx
 pytest
 pytest-asyncio
+passlib[bcrypt]
+python-jose
+python-multipart
