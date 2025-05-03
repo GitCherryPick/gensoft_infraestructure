@@ -6,6 +6,9 @@ app = FastAPI()
 class CodeInput(BaseModel):
     code: str
 
+class CodeInput2(CodeInput):
+    call: str
+
 @app.get("/")
 def root():
     return {"message": "Hi World from Sandbox!"}
@@ -14,3 +17,8 @@ def root():
 def run_python_code(payload: CodeInput):
     stdout, stderr = executor.run_code(payload.code)
     return {"output": stdout, "errors": stderr}
+
+@app.post("/execute")
+def execute_code(payload: CodeInput2):
+    result = executor.execute_code(payload.code, payload.call)
+    return result

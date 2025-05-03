@@ -20,3 +20,38 @@ def test_error_program():
     assert response_data["output"] == ""
     assert "SyntaxError" in response_data["errors"]
 
+def test_with_call():
+    code = "def hi2():\n    print('hola')"
+    call = "5+5"
+    response = client.post("/execute", json={"code": code, "call": call})
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["output"] == "10\n"
+    assert response_data["error"] == ""
+
+def test_with_code_error():
+    code = "def hi():\n    return 3+3+j"
+    call = "hi()"
+    response = client.post("/execute", json={"code": code, "call": call})
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["output"] == ""
+    assert "NameError" in response_data["error"]
+
+def test_with_call_error():
+    code = "def hi():\n    return 3+3+5"
+    call = "hi(5)"
+    response = client.post("/execute", json={"code": code, "call": call})
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["output"] == ""
+    assert "TypeError" in response_data["error"]
+
+def test_withTimeout():
+    code = "import time\ntime.sleep(5)"
+    call = "5+5"
+    response = client.post("/execute", json={"code": code, "call": call})
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["output"] == ""
+    assert "TimeOut" in response_data["error"]

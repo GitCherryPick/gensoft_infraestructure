@@ -84,7 +84,7 @@ services:
       retries: 10
     command: --default-authentication-plugin=mysql_native_password
     networks:
-      - none
+      - gensoft-network
   
   user-management-service:
     build: ./user-management-service
@@ -144,7 +144,7 @@ services:
     volumes:
       - ./sandbox:/app 
     networks:
-      - none
+      - gensoft-network
     pids_limit: 100
   
   sandbox-test:
@@ -162,7 +162,7 @@ services:
     volumes:
       - ./sandbox:/app 
     networks:
-      - none
+      - gensoft-network
 
   content-management-service:
     build: ./content-management-service
@@ -257,6 +257,3 @@ volumes:
 networks:
   gensoft-network:
     driver: bridge
-  none:
-    driver: bridge
-    internal: true
