@@ -7,8 +7,10 @@ from app.model import User, StudentTransfer, Institution
 from app.schema.users import UserCreate, UserResponse
 from app.schema.institutions import InstitutionCreate, InstitutionResponse
 from app.schema.student_transfers import StudentTransferCreate, StudentTransferResponse
+from app.schema.reset_password import PasswordResetRequest, PasswordResetConfirm
 from app.api import institutions
 from app.model.base import Base
+from api.reset_password import router as reset_password_router
 import sys
 import os
 
@@ -18,6 +20,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 app = FastAPI()
 
 app.include_router(institutions.router)
+app.include_router(reset_password_router, prefix="/auth", tags=["auth"])
+
 Base.metadata.create_all(bind=engine)
 
 def get_db():
