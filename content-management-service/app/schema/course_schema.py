@@ -10,16 +10,18 @@ class CourseBase(BaseModel):
 class CourseCreate(CourseBase):
     pass
 
-class CourseUpdate(CourseBase):
-    pass
+class CourseUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    difficulty: Optional[str] = None
 
 class CourseOut(CourseBase):
     id: int
-    created_at: datetime
-    updated_at: datetime
-    modules: List[dict] = []
-    help_resources: List[dict] = []
-    reviews: List[dict] = []
-
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    
     class Config:
         orm_mode = True
+        json_encoders = {
+            datetime: lambda dt: dt.isoformat() if dt else None
+        }
