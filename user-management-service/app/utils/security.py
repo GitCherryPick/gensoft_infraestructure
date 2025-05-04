@@ -1,19 +1,20 @@
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from passlib.context import CryptContext
 
-# Configuración
 SECRET_KEY = "gensoft"  
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12) # Configuración de bcrypt con cost factor 12
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password) #Hashea una contraseña usando bcrypt.
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password) #Verifica si una contraseña coincide con su hash.
+
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()

@@ -7,6 +7,7 @@ from app.model import User, StudentTransfer, Institution
 from app.schema.users import UserCreate, UserResponse
 from app.schema.institutions import InstitutionCreate, InstitutionResponse
 from app.schema.student_transfers import StudentTransferCreate, StudentTransferResponse
+from app.utils.security import hash_password
 from app.api import institutions
 from app.model.base import Base
 from app.api import auth 
@@ -41,10 +42,11 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.post("/users/", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    hashed_password = hash_password(user.password)  # Hashear la contraseña con bcrypt
     db_user = User(
         username=user.username,
         email=user.email,
-        password_hash=user.password,  # Use bcrypt in production
+        password_hash=hashed_password,  # Ahora guardamos el hash
         full_name=user.full_name or "",
         status="active",
     )
