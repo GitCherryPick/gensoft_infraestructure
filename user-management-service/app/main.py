@@ -44,7 +44,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = User(
         username=user.username,
         email=user.email,
-        password_hash=f"hashed_{user.password}",  # Use bcrypt in production
+        password_hash=user.password,  # Use bcrypt in production
         full_name=user.full_name or "",
         status="active",
     )
