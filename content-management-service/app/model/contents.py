@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database import Base
 
 class Content(Base):
     __tablename__ = "contents"
