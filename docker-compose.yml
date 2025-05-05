@@ -124,6 +124,11 @@ services:
 
   sandbox:
     build: ./sandbox
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     ports:
       - "8002:8002"
     depends_on:
@@ -140,6 +145,7 @@ services:
       - ./sandbox:/app 
     networks:
       - gensoft-network
+    pids_limit: 100
   
   sandbox-test:
     build:
