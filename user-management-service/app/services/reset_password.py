@@ -5,11 +5,11 @@ from ..utils.email import send_email  # deberás implementar esto
 
 def request_password_reset(email: str, db: Session):
     user = get_user_by_email(email, db)
-    if not user:
+    if not user: 
         return False 
     token = create_reset_token(email)
-    reset_link = f"http://localhost:3000/reset-password?token={token}"
-    send_email(email, "Restablecer contraseña", f"Enlace: {reset_link}")
+    reset_link = f"http://localhost:3000/recover-password/password-reset-card?token={token}"
+    send_email(email, "Restablecer contraseña", f"{reset_link}")
     return True
 
 def confirm_password_reset(token: str, new_password: str, db: Session):
