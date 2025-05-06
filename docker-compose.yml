@@ -145,7 +145,6 @@ services:
       - ./sandbox:/app 
     networks:
       - gensoft-network
-    pids_limit: 100
   
   sandbox-test:
     build:
