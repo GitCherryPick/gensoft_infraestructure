@@ -10,7 +10,7 @@ from app.schema.student_transfers import StudentTransferCreate, StudentTransferR
 from app.schema.reset_password import PasswordResetRequest, PasswordResetConfirm
 from app.api import institutions
 from app.model.base import Base
-from api.reset_password import router as reset_password_router
+from app.api.reset_password import router as reset_password_router
 import sys
 import os
 
