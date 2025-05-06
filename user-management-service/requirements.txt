@@ -7,6 +7,8 @@ cryptography
 httpx
 pytest
 pytest-asyncio
-passlib[bcrypt]
+bcrypt==3.2.2
+passlib==1.7.4
 python-jose
-python-multipart
+email-validator
+python-dotenv
