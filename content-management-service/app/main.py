@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.model.base import Base
 from app.database import engine
+from app.model import Content, Course, HelpResource, Module
 
 app = FastAPI()
 

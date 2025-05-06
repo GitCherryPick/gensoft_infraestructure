@@ -9,7 +9,7 @@ DB_NAME = os.getenv('DB_NAME', 'content_db_test')
 DB_USER = os.getenv('DB_USER', 'content_user')
 DB_PASSWORD = os.getenv('DB_PASSWORD', 'content_pass')
 
-SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
