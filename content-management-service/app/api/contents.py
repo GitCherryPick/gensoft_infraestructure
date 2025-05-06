@@ -7,8 +7,8 @@ import uuid
 import shutil
 
 from app.database import SessionLocal
-from app.model.contents import Content
-from app.model.modules import Module
+from app.model.content import Content
+from app.model.module import Module
 from app.schema.contents import ContentCreate, ContentOut, ContentUpdate, TextContentCreate, UrlContentCreate
 
 router = APIRouter()

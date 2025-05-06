@@ -1,12 +1,11 @@
 from pydantic import BaseModel
-from typing import Optional, List
-from datetime import datetime
+from typing import Optional
 
 class ModuleBase(BaseModel):
     course_id: int
     title: str
     description: Optional[str] = None
-    level: Optional[str] = None
+    level: str
     module_order: Optional[int] = None
 
 class ModuleCreate(ModuleBase):

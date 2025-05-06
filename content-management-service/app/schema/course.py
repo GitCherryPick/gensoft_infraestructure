@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from typing import Optional, List
 from datetime import datetime
+from typing import Optional, List
 
 class CourseBase(BaseModel):
     title: str
     description: Optional[str] = None
-    difficulty: Optional[str] = None
+    difficulty: str
 
 class CourseCreate(CourseBase):
     pass

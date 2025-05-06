@@ -1,10 +1,6 @@
 from fastapi import FastAPI
 from app.database import engine
 from app.model.base import Base
-from app.model.courses import Course
-from app.model.modules import Module
-from app.model.contents import Content
-from app.model.help_resource import HelpResource
 
 from app.api import courses, modules, contents
 
@@ -18,7 +14,11 @@ app = FastAPI(
 
 @app.get("/")
 def root():
-    return {"message": "Welcome OER Microservice here!"}
+    return {"message": "Welcome to Content Management microservice!"}
+
+@app.get("/pai")
+def paila():
+    return 124
 
 # Incluir routers
 app.include_router(courses.router, prefix="/courses", tags=["courses"])

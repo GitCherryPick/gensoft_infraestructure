@@ -9,7 +9,7 @@ class Module(Base):
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
     title = Column(String(150), nullable=False)
     description = Column(Text)
-    level = Column(String(20))
+    level = Column(String(20), nullable=False)
     module_order = Column(Integer)
 
     course = relationship("Course", back_populates="modules")

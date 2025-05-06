@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app.database import SessionLocal
 from app.model.courses import Course
-from app.schema.course_schema import CourseOut, CourseCreate, CourseUpdate
+from app.schema.course import CourseOut, CourseCreate, CourseUpdate
 
 router = APIRouter()
 
