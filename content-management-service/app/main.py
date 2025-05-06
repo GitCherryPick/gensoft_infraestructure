@@ -1,11 +1,17 @@
 from fastapi import FastAPI
-from app.model.base import Base
 from app.database import engine
-from app.model import Content, Course, HelpResource, Module
+from app.model.base import Base
+from app.model import Course, Content, Module, HelpResource
 
-app = FastAPI()
+from app.api import courses, modules, contents
 
 Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="Content Management API",
+    description="API para gestionar cursos, módulos y contenidos educativos",
+    version="1.0.0"
+)
 
 @app.get("/")
 def root():

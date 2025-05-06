@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from .base import Base
+from app.model.base import Base
 
 class Module(Base):
     __tablename__ = "modules"
@@ -13,4 +13,6 @@ class Module(Base):
     module_order = Column(Integer)
 
     course = relationship("Course", back_populates="modules")
-    contents = relationship("Content", back_populates="module")
+    contents = relationship("Content", back_populates="module", cascade="all, delete-orphan")
+    
+    # institution = relationship("Institution", back_populates="modules")
