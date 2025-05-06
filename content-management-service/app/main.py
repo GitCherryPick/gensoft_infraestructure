@@ -1,16 +1,13 @@
 from fastapi import FastAPI
 from app.database import engine
 from app.model.base import Base
-# Importar todos los modelos para que SQLAlchemy los registre
 from app.model.courses import Course
 from app.model.modules import Module
 from app.model.contents import Content
 from app.model.help_resource import HelpResource
 
-# Importar routers
 from app.api import courses, modules, contents
 
-# Crear tablas en la base de datos
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(

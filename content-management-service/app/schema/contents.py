@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator, HttpUrl
+from pydantic import BaseModel, validator
 from typing import Optional
 from datetime import datetime
 import re
@@ -37,7 +37,7 @@ class ContentOut(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ContentUpdate(BaseModel):
@@ -60,4 +60,20 @@ class ContentUpdate(BaseModel):
         if v is not None:
             if not re.match(r'^https?://', v):
                 raise ValueError('La URL debe comenzar con http:// o https://')
+        return v
+
+class TextContentCreate(BaseModel):
+    module_id: int
+    content: str
+    title: Optional[str] = None
+
+class UrlContentCreate(BaseModel):
+    module_id: int
+    url: str
+    title: Optional[str] = None
+    
+    @validator('url')
+    def validate_url(cls, v):
+        if not re.match(r'^https?://', v):
+            raise ValueError('La URL debe comenzar con http:// o https://')
         return v

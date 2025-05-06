@@ -89,7 +89,6 @@ def update_module(module_id: int, module_update: ModuleUpdate, db: Session = Dep
         if db_module is None:
             raise HTTPException(status_code=404, detail="Module not found")
         
-        # Actualizar los campos del módulo
         update_data = module_update.dict(exclude_unset=True)
         for field, value in update_data.items():
             setattr(db_module, field, value)

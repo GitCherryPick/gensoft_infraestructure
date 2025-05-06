@@ -21,7 +21,7 @@ class CourseOut(CourseBase):
     updated_at: Optional[datetime] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
         json_encoders = {
             datetime: lambda dt: dt.isoformat() if dt else None
         }

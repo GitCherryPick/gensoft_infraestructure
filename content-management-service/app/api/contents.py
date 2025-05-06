@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict
 from datetime import datetime
@@ -9,11 +9,10 @@ import shutil
 from app.database import SessionLocal
 from app.model.contents import Content
 from app.model.modules import Module
-from app.schema.contents import ContentCreate, ContentOut, ContentUpdate
+from app.schema.contents import ContentCreate, ContentOut, ContentUpdate, TextContentCreate, UrlContentCreate
 
 router = APIRouter()
 
-# Directorio base para almacenar archivos
 UPLOAD_DIR = "storage"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(os.path.join(UPLOAD_DIR, "pdf"), exist_ok=True)
@@ -28,7 +27,6 @@ def get_db():
     finally:
         db.close()
 
-# Función auxiliar para verificar si un módulo existe
 def verify_module_exists(module_id: int, db: Session):
     module = db.query(Module).filter(Module.id == module_id).first()
     if not module:
@@ -36,7 +34,6 @@ def verify_module_exists(module_id: int, db: Session):
     return module
 
 # CRUD básico para contenidos
-
 @router.post("/", response_model=ContentOut, status_code=status.HTTP_201_CREATED)
 def create_content(content: ContentCreate, db: Session = Depends(get_db)):
     """
@@ -98,10 +95,7 @@ def get_contents_by_module_and_type(module_id: int, content_type: str, db: Sessi
     Obtener contenidos por módulo y tipo
     """
     try:
-        # Verificar que el módulo existe
         verify_module_exists(module_id, db)
-        
-        # Validar el tipo de contenido
         valid_types = ["text", "pdf", "image", "video", "slide", "url"]
         if content_type not in valid_types:
             raise HTTPException(
@@ -144,7 +138,6 @@ def update_content(content_id: int, content_update: ContentUpdate, db: Session =
         if db_content is None:
             raise HTTPException(status_code=404, detail="Contenido no encontrado")
         
-        # Actualizar los campos del contenido
         update_data = content_update.dict(exclude_unset=True)
         for field, value in update_data.items():
             setattr(db_content, field, value)
@@ -168,7 +161,6 @@ def delete_content(content_id: int, db: Session = Depends(get_db)):
         if db_content is None:
             raise HTTPException(status_code=404, detail="Contenido no encontrado")
         
-        # Si hay un archivo asociado, eliminarlo
         if db_content.file_path and os.path.exists(db_content.file_path):
             os.remove(db_content.file_path)
         
@@ -181,27 +173,20 @@ def delete_content(content_id: int, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al eliminar contenido: {str(e)}")
 
-# Endpoints para diferentes tipos de contenido
 
 @router.post("/text", response_model=ContentOut)
-def create_text_content(
-    module_id: int = Form(...),
-    content: str = Form(...),
-    title: Optional[str] = Form(None),
-    db: Session = Depends(get_db)
-):
+def create_text_content(content_data: TextContentCreate, db: Session = Depends(get_db)):
     """
     Crear contenido de tipo texto
     """
     try:
-        # Verificar que el módulo existe
-        verify_module_exists(module_id, db)
+        verify_module_exists(content_data.module_id, db)
         
         db_content = Content(
-            module_id=module_id,
+            module_id=content_data.module_id,
             content_type="text",
-            title=title,
-            content=content,
+            title=content_data.title,
+            content=content_data.content,
             created_at=datetime.now()
         )
         db.add(db_content)
@@ -215,28 +200,18 @@ def create_text_content(
         raise HTTPException(status_code=500, detail=f"Error al crear contenido de texto: {str(e)}")
 
 @router.post("/url", response_model=ContentOut)
-def create_url_content(
-    module_id: int = Form(...),
-    url: str = Form(...),
-    title: Optional[str] = Form(None),
-    db: Session = Depends(get_db)
-):
+def create_url_content(content_data: UrlContentCreate, db: Session = Depends(get_db)):
     """
     Crear contenido de tipo URL
     """
     try:
-        # Verificar que el módulo existe
-        verify_module_exists(module_id, db)
-        
-        # Validación básica de URL
-        if not url.startswith(('http://', 'https://')):
-            raise HTTPException(status_code=400, detail="La URL debe comenzar con http:// o https://")
+        verify_module_exists(content_data.module_id, db)
         
         db_content = Content(
-            module_id=module_id,
+            module_id=content_data.module_id,
             content_type="url",
-            title=title,
-            video_url=url,  # Usamos el campo video_url para almacenar cualquier URL
+            title=content_data.title,
+            video_url=content_data.url,
             created_at=datetime.now()
         )
         db.add(db_content)
@@ -249,246 +224,6 @@ def create_url_content(
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al crear contenido de URL: {str(e)}")
 
-# Endpoints para subida de archivos
-
-@router.post("/upload/pdf", response_model=ContentOut)
-async def upload_pdf(
-    file: UploadFile = File(...),
-    module_id: int = Form(...),
-    title: Optional[str] = Form(None),
-    db: Session = Depends(get_db)
-):
-    """
-    Subir un archivo PDF y crear contenido
-    """
-    try:
-        # Verificar que el módulo existe
-        verify_module_exists(module_id, db)
-        
-        # Verificar tipo de archivo
-        if not file.content_type == "application/pdf":
-            raise HTTPException(status_code=400, detail="El archivo debe ser un PDF")
-        
-        # Verificar tamaño del archivo (máximo 10MB)
-        file_size = 0
-        file.file.seek(0, 2)  # Ir al final del archivo
-        file_size = file.file.tell()  # Obtener posición actual (tamaño)
-        file.file.seek(0)  # Volver al inicio
-        
-        if file_size > 10 * 1024 * 1024:  # 10MB
-            raise HTTPException(status_code=400, detail="El archivo no debe superar los 10MB")
-        
-        # Generar nombre único para el archivo
-        filename = f"{uuid.uuid4()}.pdf"
-        file_path = os.path.join(UPLOAD_DIR, "pdf", filename)
-        
-        # Guardar el archivo
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        # Crear registro en la base de datos
-        db_content = Content(
-            module_id=module_id,
-            content_type="pdf",
-            title=title,
-            file_path=file_path,
-            created_at=datetime.now()
-        )
-        db.add(db_content)
-        db.commit()
-        db.refresh(db_content)
-        return db_content
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        # Si hubo un error y se creó el archivo, eliminarlo
-        if 'file_path' in locals() and os.path.exists(file_path):
-            os.remove(file_path)
-        raise HTTPException(status_code=500, detail=f"Error al subir PDF: {str(e)}")
-
-@router.post("/upload/image", response_model=ContentOut)
-async def upload_image(
-    file: UploadFile = File(...),
-    module_id: int = Form(...),
-    title: Optional[str] = Form(None),
-    db: Session = Depends(get_db)
-):
-    """
-    Subir una imagen y crear contenido
-    """
-    try:
-        # Verificar que el módulo existe
-        verify_module_exists(module_id, db)
-        
-        # Verificar tipo de archivo
-        if not file.content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="El archivo debe ser una imagen")
-        
-        # Verificar tamaño del archivo (máximo 5MB)
-        file_size = 0
-        file.file.seek(0, 2)
-        file_size = file.file.tell()
-        file.file.seek(0)
-        
-        if file_size > 5 * 1024 * 1024:  # 5MB
-            raise HTTPException(status_code=400, detail="La imagen no debe superar los 5MB")
-        
-        # Obtener extensión del archivo
-        ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
-        
-        # Generar nombre único para el archivo
-        filename = f"{uuid.uuid4()}.{ext}"
-        file_path = os.path.join(UPLOAD_DIR, "images", filename)
-        
-        # Guardar el archivo
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        # Crear registro en la base de datos
-        db_content = Content(
-            module_id=module_id,
-            content_type="image",
-            title=title,
-            file_path=file_path,
-            created_at=datetime.now()
-        )
-        db.add(db_content)
-        db.commit()
-        db.refresh(db_content)
-        return db_content
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        # Si hubo un error y se creó el archivo, eliminarlo
-        if 'file_path' in locals() and os.path.exists(file_path):
-            os.remove(file_path)
-        raise HTTPException(status_code=500, detail=f"Error al subir imagen: {str(e)}")
-
-@router.post("/upload/video", response_model=ContentOut)
-async def upload_video(
-    file: UploadFile = File(...),
-    module_id: int = Form(...),
-    title: Optional[str] = Form(None),
-    db: Session = Depends(get_db)
-):
-    """
-    Subir un video y crear contenido
-    """
-    try:
-        # Verificar que el módulo existe
-        verify_module_exists(module_id, db)
-        
-        # Verificar tipo de archivo
-        if not file.content_type.startswith("video/"):
-            raise HTTPException(status_code=400, detail="El archivo debe ser un video")
-        
-        # Verificar tamaño del archivo (máximo 100MB)
-        file_size = 0
-        file.file.seek(0, 2)
-        file_size = file.file.tell()
-        file.file.seek(0)
-        
-        if file_size > 100 * 1024 * 1024:  # 100MB
-            raise HTTPException(status_code=400, detail="El video no debe superar los 100MB")
-        
-        # Obtener extensión del archivo
-        ext = file.filename.split(".")[-1] if "." in file.filename else "mp4"
-        
-        # Generar nombre único para el archivo
-        filename = f"{uuid.uuid4()}.{ext}"
-        file_path = os.path.join(UPLOAD_DIR, "videos", filename)
-        
-        # Guardar el archivo
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        # Crear registro en la base de datos
-        db_content = Content(
-            module_id=module_id,
-            content_type="video",
-            title=title,
-            file_path=file_path,
-            created_at=datetime.now()
-        )
-        db.add(db_content)
-        db.commit()
-        db.refresh(db_content)
-        return db_content
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        # Si hubo un error y se creó el archivo, eliminarlo
-        if 'file_path' in locals() and os.path.exists(file_path):
-            os.remove(file_path)
-        raise HTTPException(status_code=500, detail=f"Error al subir video: {str(e)}")
-
-@router.post("/upload/slide", response_model=ContentOut)
-async def upload_slide(
-    file: UploadFile = File(...),
-    module_id: int = Form(...),
-    title: Optional[str] = Form(None),
-    db: Session = Depends(get_db)
-):
-    """
-    Subir una presentación y crear contenido
-    """
-    try:
-        # Verificar que el módulo existe
-        verify_module_exists(module_id, db)
-        
-        # Verificar tipo de archivo (pptx, ppt, etc.)
-        valid_types = [
-            "application/vnd.ms-powerpoint",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-        ]
-        if file.content_type not in valid_types:
-            raise HTTPException(status_code=400, detail="El archivo debe ser una presentación (PPT, PPTX)")
-        
-        # Verificar tamaño del archivo (máximo 20MB)
-        file_size = 0
-        file.file.seek(0, 2)
-        file_size = file.file.tell()
-        file.file.seek(0)
-        
-        if file_size > 20 * 1024 * 1024:  # 20MB
-            raise HTTPException(status_code=400, detail="La presentación no debe superar los 20MB")
-        
-        # Obtener extensión del archivo
-        ext = file.filename.split(".")[-1] if "." in file.filename else "pptx"
-        
-        # Generar nombre único para el archivo
-        filename = f"{uuid.uuid4()}.{ext}"
-        file_path = os.path.join(UPLOAD_DIR, "slides", filename)
-        
-        # Guardar el archivo
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        # Crear registro en la base de datos
-        db_content = Content(
-            module_id=module_id,
-            content_type="slide",
-            title=title,
-            file_path=file_path,
-            created_at=datetime.now()
-        )
-        db.add(db_content)
-        db.commit()
-        db.refresh(db_content)
-        return db_content
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        # Si hubo un error y se creó el archivo, eliminarlo
-        if 'file_path' in locals() and os.path.exists(file_path):
-            os.remove(file_path)
-        raise HTTPException(status_code=500, detail=f"Error al subir presentación: {str(e)}")
-
-# Endpoint para obtener información sobre tipos de contenido válidos
 @router.get("/types", response_model=Dict[str, List[str]])
 def get_content_types():
     """

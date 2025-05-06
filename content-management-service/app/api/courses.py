@@ -76,13 +76,9 @@ def update_course(course_id: int, course_update: CourseUpdate, db: Session = Dep
         db_course = db.query(Course).filter(Course.id == course_id).first()
         if db_course is None:
             raise HTTPException(status_code=404, detail="Course not found")
-        
-        # Actualizar los campos del curso
         update_data = course_update.dict(exclude_unset=True)
         for field, value in update_data.items():
             setattr(db_course, field, value)
-        
-        # Actualizar la fecha de modificación
         db_course.updated_at = datetime.now()
         
         db.commit()
@@ -122,13 +118,10 @@ def get_default_course_id(db: Session = Depends(get_db)):
     Si no existe, lo crea y devuelve su ID.
     """
     try:
-        # Título del curso por defecto
         default_title = "Introduccion a la programacion"
         
-        # Buscar si ya existe el curso por defecto
         default_course = db.query(Course).filter(Course.title == default_title).first()
         
-        # Si no existe, crearlo
         if default_course is None:
             default_course = Course(
                 title=default_title,
@@ -141,7 +134,6 @@ def get_default_course_id(db: Session = Depends(get_db)):
             db.commit()
             db.refresh(default_course)
             
-        # Devolver el ID del curso por defecto
         return {"default_course_id": default_course.id}
     except Exception as e:
         db.rollback()
