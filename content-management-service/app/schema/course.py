@@ -15,7 +15,7 @@ class CourseUpdate(BaseModel):
     description: Optional[str] = None
     difficulty: Optional[str] = None
 
-class Course(CourseBase):
+class CourseOut(CourseBase):
     id: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

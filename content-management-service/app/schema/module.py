@@ -18,7 +18,7 @@ class ModuleUpdate(BaseModel):
     module_order: Optional[int] = None
     course_id: Optional[int] = None
 
-class Module(ModuleBase):
+class ModuleOut(ModuleBase):
     id: int
 
     class Config:

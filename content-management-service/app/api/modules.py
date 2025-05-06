@@ -4,8 +4,8 @@ from typing import List
 from datetime import datetime
 
 from app.database import SessionLocal
-from app.model.modules import Module
-from app.schema.module_schema import ModuleOut, ModuleCreate, ModuleUpdate
+from app.model.module import Module
+from app.schema.module import ModuleOut, ModuleCreate, ModuleUpdate
 
 router = APIRouter()
 

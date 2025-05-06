@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from app.database import engine
 from app.model.base import Base
-from app.model import Course, Content, Module, HelpResource
 
 from app.api import courses, modules, contents
 
@@ -20,3 +19,8 @@ def root():
 @app.get("/pai")
 def paila():
     return 124
+
+# Incluir routers
+app.include_router(courses.router, prefix="/courses", tags=["courses"])
+app.include_router(modules.router, prefix="/modules", tags=["modules"])
+app.include_router(contents.router, prefix="/contents", tags=["contents"])
