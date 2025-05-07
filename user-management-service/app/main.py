@@ -7,8 +7,11 @@ from app.model import User, StudentTransfer, Institution
 from app.schema.users import UserCreate, UserResponse
 from app.schema.institutions import InstitutionCreate, InstitutionResponse
 from app.schema.student_transfers import StudentTransferCreate, StudentTransferResponse
+from app.schema.reset_password import PasswordResetRequest, PasswordResetConfirm
 from app.api import institutions
 from app.model.base import Base
+from app.api.reset_password import router as reset_password_router
+from app.api import auth 
 import sys
 import os
 
@@ -16,10 +19,19 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(institutions.router)
-Base.metadata.create_all(bind=engine)
+app.include_router(reset_password_router, prefix="/auth", tags=["auth"])
 
+Base.metadata.create_all(bind=engine)
+app.include_router(auth.router)
 def get_db():
     db = SessionLocal()
     try:
@@ -43,7 +55,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = User(
         username=user.username,
         email=user.email,
-        password_hash=f"hashed_{user.password}",  # Use bcrypt in production
+        password_hash=user.password,  # Use bcrypt in production
         full_name=user.full_name or "",
         status="active",
     )
@@ -66,3 +78,12 @@ def get_student_transfer(transfer_id: int, db: Session = Depends(get_db)):
     if transfer is None:
         return {"error": "student transfer not found"}
     return transfer
+
+@app.delete("/users/{user_username}")
+def delete_user(user_username: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == user_username).first()
+    if user is None:
+        return {"error": "user not found"}
+    db.delete(user)
+    db.commit()
+    return {"message": "User deleted successfully"}
