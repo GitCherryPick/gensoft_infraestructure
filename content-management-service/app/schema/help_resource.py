@@ -1,23 +1,23 @@
 from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 class HelpResourceBase(BaseModel):
+    course_id: Optional[int] = None
     title: str
-    resource_type: str
     description: Optional[str] = None
+    resource_type: str
     file_path: Optional[str] = None
     video_url: Optional[str] = None
 
 class HelpResourceCreate(HelpResourceBase):
-    course_id: Optional[int]
+    pass
 
 class HelpResourceUpdate(HelpResourceBase):
     pass
 
-class HelpResourceOut(HelpResourceBase):
+class HelpResource(HelpResourceBase):
     id: int
-    course_id: Optional[int]
     created_at: datetime
     updated_at: datetime
 

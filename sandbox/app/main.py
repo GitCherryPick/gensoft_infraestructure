@@ -17,4 +17,3 @@ def root():
     return {"message": "Hi World from Sandbox!"}
 
 app.include_router(executor.router, tags=["executor"])
-app.include_router(executor.router)

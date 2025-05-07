@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 class ContentBase(BaseModel):
     module_id: int
@@ -16,7 +16,7 @@ class ContentCreate(ContentBase):
 class ContentUpdate(ContentBase):
     pass
 
-class ContentOut(ContentBase):
+class Content(ContentBase):
     id: int
     created_at: datetime
 
