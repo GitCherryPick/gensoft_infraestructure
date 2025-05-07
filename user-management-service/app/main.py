@@ -11,6 +11,7 @@ from app.schema.reset_password import PasswordResetRequest, PasswordResetConfirm
 from app.api import institutions
 from app.model.base import Base
 from app.api.reset_password import router as reset_password_router
+from app.api import auth 
 import sys
 import os
 
@@ -30,7 +31,7 @@ app.include_router(institutions.router)
 app.include_router(reset_password_router, prefix="/auth", tags=["auth"])
 
 Base.metadata.create_all(bind=engine)
-
+app.include_router(auth.router)
 def get_db():
     db = SessionLocal()
     try:
@@ -54,7 +55,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = User(
         username=user.username,
         email=user.email,
-        password_hash=f"hashed_{user.password}",  # Use bcrypt in production
+        password_hash=user.password,  # Use bcrypt in production
         full_name=user.full_name or "",
         status="active",
     )
