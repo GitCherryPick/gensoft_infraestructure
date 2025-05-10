@@ -4,7 +4,7 @@ from app.services import student_stats as crud
 from app.schema.student_stats import StudentStatsRequest,StudentStatsUpdateRequest, StudentStatsResponse
 from app.database import get_db  
 
-router = APIRouter(prefix="/student-stats", tags=["Student Stats"])
+router = APIRouter()
 
 @router.post("/", response_model=StudentStatsResponse)
 def create(stats: StudentStatsRequest, db: Session = Depends(get_db)):
