@@ -1,44 +1,46 @@
 from pydantic import BaseModel, field_validator
-from typing import List, Dict, Optional
+from typing import Any, List, Dict, Optional
 from datetime import datetime
 
-@field_validator("common_mistakes", pre=True, always=True)
-def validate_common_mistakes(cls, value):
-    if value is not None and not isinstance(value, dict):
-        raise ValueError("common_mistakes must be a dictionary")
-    return value
-
-@field_validator("interests", pre=True, always=True)
-def validate_interests(cls, value):
-    if value is not None and not all(isinstance(i, str) for i in value):
-        raise ValueError("All interests must be strings")
-    return value
-
-@field_validator(pre=True)
-def validate_performance_stats(cls, values):
-    performance_stats = values.get("performance_stats")
-    if performance_stats is not None and not isinstance(performance_stats, dict):
-        raise ValueError("performance_stats must be a dictionary")
-    return values
-
-class StudentStats(BaseModel):
+class StudentStatsBase(BaseModel):
     student_id: int
+    total_activities_answered: Optional[int] = 0
+    common_mistakes: Optional[Dict[str, Any]] = {}
+    interests: Optional[List[str]] = []
+    performance_stats: Optional[Dict[str, Any]] = None
 
-class StudentStatsRequest(StudentStats):
-    common_mistakes: Optional[Dict] = None
-    interests: Optional[List[str]] = None
-    performance_stats: Optional[Dict] = None
-    last_accessed: datetime
+    @field_validator("common_mistakes", pre=True, always=True)
+    def validate_common_mistakes(cls, value):
+        if value is not None and not isinstance(value, dict):
+            raise ValueError("common_mistakes must be a dictionary")
+        return value
 
-    class Config:
-        from_attributes = True
+    @field_validator("interests", pre=True, always=True)
+    def validate_interests(cls, value):
+        if value is not None and not all(isinstance(i, str) for i in value):
+            raise ValueError("All interests must be strings")
+        return value
 
-class StudentStatsResponse(StudentStats):
+    @field_validator("performance_stats", pre=True, always=True)
+    def validate_performance_stats(cls, value):
+        if value is not None and not isinstance(value, dict):
+            raise ValueError("performance_stats must be a dictionary")
+        return value
+
+
+class StudentStatsRequest(StudentStatsBase):
+    pass
+
+
+class StudentStatsUpdateRequest(BaseModel):
+    total_activities_answered: Optional[int]
+    common_mistakes: Optional[Dict[str, Any]]
+    interests: Optional[List[str]]
+    performance_stats: Optional[Dict[str, Any]]
+
+
+class StudentStatsResponse(StudentStatsBase):
     id: int
-    total_activities_answered: int
-    common_mistakes: Optional[Dict] = None
-    interests: Optional[List[str]] = None
-    performance_stats: Optional[Dict] = None
     last_accessed: datetime
 
     class Config:
