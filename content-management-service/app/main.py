@@ -1,10 +1,11 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine
 from app.model.base import Base
 
 from app.api import courses, modules, contents
-
+from fastapi.staticfiles import StaticFiles
 
 Base.metadata.create_all(bind=engine)
 
@@ -13,6 +14,10 @@ app = FastAPI(
     description="API para gestionar cursos, módulos y contenidos educativos",
     version="1.0.0"
 )
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+storage_path = os.path.join(current_dir, "..", "storage")
+app.mount("/storage", StaticFiles(directory=storage_path), name="storage")
 
 app.add_middleware(
     CORSMiddleware,
