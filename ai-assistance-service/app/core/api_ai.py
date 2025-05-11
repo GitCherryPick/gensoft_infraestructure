@@ -36,3 +36,32 @@ def ask_ai(question_text: str):
             "answer":str(e),
             "status":"error",
         }
+    
+def conversate_ai(question_text: str):
+    """
+    Conversing with an AI model.
+    """
+    try:
+        client = genai.Client(api_key=api_key_gensoft)
+        chat = client.chats.create(
+            model="gemini-2.0-flash",
+        )
+        response = chat.send_message(question_text)
+        print(response.text)
+        role = ""
+        message_show = ""
+        for message in chat.get_history():
+            role += ' {message.role}'
+            message_show = message_show + message.parts[0].text + "\n"
+        return {
+            "status": "success",
+            "role": role,
+            "message_show": message_show
+        }
+    except Exception as e:
+        print(f"Error al llamar a la API-gemini: {e}")
+        return {
+            "status": "error",
+            "role": "Ninguno",
+            "message_show": f"Error {e}"
+        }
