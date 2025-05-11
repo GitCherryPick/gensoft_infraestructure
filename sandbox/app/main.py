@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import executor
+from app.api import tasks
 
 app = FastAPI()
 
@@ -17,3 +18,4 @@ def root():
     return {"message": "Hi World from Sandbox!"}
 
 app.include_router(executor.router, tags=["executor"])
+app.include_router(tasks.router, tags=["tasks"])
