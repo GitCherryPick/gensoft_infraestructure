@@ -1,2 +1,9 @@
 fastapi
 uvicorn
+sqlalchemy
+pydantic
+pymysql
+httpx
+pytest
+pytest-asyncio
+google-genai
