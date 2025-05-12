@@ -2,7 +2,7 @@ name: CI - GitCherryPick
 
 on:
   push:
-    branches: [main]
+    branches: [main, sprint/03]
   pull_request:
     branches: [main, sprint/03]
 
@@ -57,6 +57,13 @@ jobs:
 
     - name: sandbox works
       run: curl http://localhost:8002/docs || echo "Error"
+
+    - name: Run tests
+      run: docker-compose up --abort-on-container-exit \
+             user-management-service-test \
+             sandbox-test \
+             ai-assistance-service-test \
+             content-management-service-test
 
     - name: Show logs
       run: docker compose logs
