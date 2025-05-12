@@ -6,6 +6,4 @@ pymysql
 httpx
 pytest
 pytest-asyncio
-python-dotenv
 google-genai
-google-generativeai
