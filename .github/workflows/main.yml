@@ -2,9 +2,13 @@ name: CI - GitCherryPick
 
 on:
   push:
-    branches: [main, sprint/03]
+    branches:
+      - main
+      - 'sprint/**'
   pull_request:
-    branches: [main, sprint/03]
+    branches:
+      - main
+      - 'sprint/**'
 
 jobs:
   build-and-run:
