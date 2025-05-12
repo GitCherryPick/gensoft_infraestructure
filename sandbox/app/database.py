@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-DB_HOST = os.getenv('CODE_DB_HOST', 'mysql-code')
+DB_HOST = os.getenv('CODE_DB_HOST', 'mysql-code-exec')
 DB_PORT = os.getenv('DB_PORT', '3306')
 DB_NAME = os.getenv('CODE_DB_NAME', 'code_db')
 DB_USER = os.getenv('CODE_DB_USER', 'code_user')
@@ -15,3 +15,10 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
