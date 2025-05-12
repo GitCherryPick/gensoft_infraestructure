@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mysql-db:
     image: mysql:8.0.41
@@ -130,11 +128,6 @@ services:
     build: ./sandbox
     env_file:
       - ./.env
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
     ports:
       - "8002:8002"
     depends_on:
@@ -152,6 +145,12 @@ services:
     networks:
       - gensoft-network
     pids_limit: 100
+    mem_limit: 256m
+    cpus: "0.5"
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
   
   sandbox-test:
     build:
