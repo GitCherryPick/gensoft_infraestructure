@@ -186,7 +186,7 @@ services:
   content-management-service-test:
     build:
       context: ./content-management-service
-    command: pytest tests --disable-warnings
+    command: pytest tests
     depends_on:
     - mysql-content
     environment:

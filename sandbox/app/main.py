@@ -6,10 +6,7 @@ from .database import engine
 
 from app.api.submissions import router as submissions_router
 
-app = FastAPI(
-    title="Sandbox API",
-    version="1.0.0"
-)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
