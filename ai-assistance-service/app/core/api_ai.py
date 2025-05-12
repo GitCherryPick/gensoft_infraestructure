@@ -1,8 +1,10 @@
+from typing import Dict
 from app.schema.ai_question import AIQuestion, AIResponse
 from google import genai
 from google.genai import types
 import os
 
+chat_sessions: Dict[str, any] = {}
 api_key_gensoft = os.getenv('AI_API_KEY')
 
 if not api_key_gensoft:
@@ -33,31 +35,35 @@ def ask_ai(question_text: str):
             "status":"error",
         }
     
-def conversate_ai(question_text: str):
+def conversate_ai(user_id: int, question_text: str):
     """
     Conversing with an AI model.
     """
     try:
-        client = genai.Client(api_key=api_key_gensoft)
-        chat = client.chats.create(
-            model="gemini-2.0-flash",
-        )
-        response = chat.send_message(question_text)
-        print(response.text)
-        role = ""
+        if user_id not in chat_sessions:
+            client = genai.Client(api_key=api_key_gensoft)
+            chat = client.chats.create(
+                model="gemini-2.0-flash",
+            )
+            chat_sessions[user_id] = chat
+        else:
+            chat = chat_sessions[user_id]
+
+        response = chat.send_message_stream(question_text)
         message_show = ""
-        for message in chat.get_history():
-            role += ' {message.role}'
-            message_show = message_show + message.parts[0].text + "\n"
+        for chunk in response:
+            if chunk.text:
+                message_show += chunk.text
+            
         return {
             "status": "success",
-            "role": role,
-            "message_show": message_show
+            "question": question_text,
+            "answer": message_show
         }
     except Exception as e:
         print(f"Error al llamar a la API-gemini: {e}")
         return {
             "status": "error",
-            "role": "Ninguno",
-            "message_show": f"Error {e}"
+            "question": "Fallido",
+            "answer": f"Error {e}"
         }

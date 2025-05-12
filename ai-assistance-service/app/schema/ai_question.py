@@ -9,5 +9,5 @@ class AIResponse(BaseModel):
 
 class AIConversateResponse(BaseModel):
     status: str
-    role: str
-    message_show: str 
+    question: str
+    answer: str 
