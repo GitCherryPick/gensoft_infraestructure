@@ -4,10 +4,13 @@ from app.model.tasks import Tasks
 from app.model.tests import Tests
 from app.schema.task import TaskCreate, TaskUpdate, TestCreate, TestBase
 from app.database import SessionLocal
+from app.schema.code_input import CodeInput, CodeInput2
+from app.api.executor import execute_code
+
+from app.schema.submission import Submission
 
 router = APIRouter()
 
-# Dependencia para obtener la base de datos
 def get_db():
     db = SessionLocal()
     try:
@@ -69,12 +72,10 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
 
 @router.post("/tasks/{task_id}/tests")
 def add_test(task_id: int, test: TestCreate, db: Session = Depends(get_db)):
-    # Verificar que la tarea exista
     task = db.query(Tasks).filter(Tasks.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
 
-    # Crear y guardar el nuevo test
     new_test = Tests(task_id=task_id, input=test.input, output=test.output)
     db.add(new_test)
     db.commit()
@@ -94,3 +95,40 @@ def delete_test(test_id: int, db: Session = Depends(get_db)):
     db.delete(test)
     db.commit()
     return {"message": "Test eliminado correctamente"}
+
+
+# logica de enviar
+
+@router.post("/enviar")
+def enviar(submission: Submission, db: Session = Depends(get_db)):
+    code_input_2_object = CodeInput2(code=submission.code, call="suma(1,2)")
+    veredicts = []
+
+    task_i = db.query(Tasks).filter(Tasks.id == submission.taskId).first()
+    id = task_i.id
+
+    test_cases = task_i.tests
+
+    for test_case in test_cases:
+        result = execute_code(CodeInput2(code=submission.code, call=test_case.input))
+
+        if result["error"]:
+            veredict = "Error"
+            error = result["error"]
+        elif result["output"].rstrip('\n') == test_case.output.rstrip('\n'):
+            veredict = "Accepted"
+            error = ""
+        else:
+            veredict = "Wrong Answer"
+            error = ""
+
+        veredicts.append({
+            "veredict": veredict,
+            "error": error
+        })
+
+
+        
+
+
+    return veredicts
