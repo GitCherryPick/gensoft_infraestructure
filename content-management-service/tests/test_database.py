@@ -6,7 +6,7 @@ import os
 DB_HOST = os.getenv('CONTENT_DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('CONTENT_DB_NAME_TEST')
-DB_USER = os.getenv('DB_UCONTENT_DB_USERSER')
+DB_USER = os.getenv('CONTENT_DB_USER')
 DB_PASSWORD = os.getenv('CONTENT_DB_PASSWORD')
 
 SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
