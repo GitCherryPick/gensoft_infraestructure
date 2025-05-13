@@ -12,65 +12,34 @@
 
 ## Estado del Proyecto
 
-En desarrollo activo. Actualmente en Sprint 01, enfocados en:
+	En desarrollo activo. Actualmente en Sprint 01, enfocados en:
 	Implementación de autenticación de usuarios.
 	Gestión de perfiles y datos de usuarios.
 	Integración del simulador de código en un entorno seguro.
 
 ## Demostración
 
-Para ejecutar el backend localmente:
-bash
+	Para ejecutar el backend localmente:
+	bash
 # Clonar el repositorio
 	git clone https://github.com/GitCherryPick/gensoft_infraestructure.git
 	cd gensoft_infraestructure
 
-# Crear un entorno virtual (opcional pero recomendado)
+# Crear un entorno virtual 
 	python -m venv venv
 	source venv/bin/activate  # Linux/Mac
-	venv\Scripts\activate     # Windows
+	venv\Scripts\activate     # Windows	
 
 # Instalar dependencias
+
 	pip install -r requirements.txt
+
+#### En caso de un fallo normalmente se ejecuta:
+
+	python.exe -m pip install --upgrade pip
 
 Configurar variables de entorno
 Crear un archivo .env con las siguientes variables (ajusta según tu configuración)
- 
-# GLOBAL 
-# Archivo .env para las predenciales
-DB_PORT=3306
-MYSQL_ROOT_PASSWORD=password
-
-USER_DB_HOST=mysql-db
-USER_DB_NAME=user_db
-USER_DB_NAME_TEST=user_db_test
-USER_DB_USER=app_user
-USER_DB_PASSWORD=user_pass
-
-CONTENT_DB_HOST=mysql-content
-CONTENT_DB_NAME=content_db
-CONTENT_DB_NAME_TEST=content_db_test
-CONTENT_DB_USER=content_user
-CONTENT_DB_PASSWORD=content_pass
-
-AI_DB_HOST=mysql-ai
-AI_DB_NAME=ai_db
-AI_DB_NAME_TEST=ai_db_test
-AI_DB_USER=ai_user
-AI_DB_PASSWORD=ai_pass
-AI_API_KEY=AIzaSyDFL5k8ZvJmrrz2BHhcfqXrmk66VKRdnnM
-
-CODE_DB_HOST=mysql-code-exec
-CODE_DB_NAME=code_db
-CODE_DB_NAME_TEST=code_db_test
-CODE_DB_USER=code_user
-CODE_DB_PASSWORD=code_pass
-
-EMAIL_HOST=smtp.sendgrid.net
-EMAIL_USERNAME=apikey  
-EMAIL_PASSWORD=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
-EMAIL_FROM=judith.margarita.paco@hotmail.com
-
 
 # Ejecutar la aplicación
 ### Antes de la ejecición se debe abrir docker desktop
@@ -93,7 +62,7 @@ Accede a la documentación automática de la API en:
 Accede a la documentación automática de la API en:
  http://localhost:8006/docs
 
- 
+
 ## Acceso al Proyecto
 Repositorio del Backend:
  https://github.com/GitCherryPick/gensoft_infraestructure
