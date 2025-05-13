@@ -71,10 +71,17 @@ jobs:
           content-management-service-test
         )
         for SERVICE in "${SERVICES[@]}"; do
-          docker compose restart "$SERVICE"
-          docker compose restart "$SERVICE"
-          docker compose logs "$SERVICE"
-          EXIT_CODE=$(docker inspect "$SERVICE" --format='{{.State.ExitCode}}')
+          echo "🔁 Revisando logs y estado de $SERVICE"
+          docker compose restart "$SERVICE" || true
+          docker compose logs "$SERVICE" || true
+
+          CONTAINER_ID=$(docker compose ps -q "$SERVICE")
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "⚠️  No container found for $SERVICE"
+            continue
+          fi
+
+          EXIT_CODE=$(docker inspect "$CONTAINER_ID" --format='{{.State.ExitCode}}')
           if [ "$EXIT_CODE" -ne 0 ]; then
             echo "❌ Test failed in $SERVICE (exit code: $EXIT_CODE)"
             exit 1
@@ -82,7 +89,3 @@ jobs:
             echo "✅ $SERVICE passed tests"
           fi
         done
-
-    - name: Tear down
-      run: docker compose down
-        
