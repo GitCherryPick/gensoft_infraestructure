@@ -59,14 +59,33 @@ jobs:
       run: curl http://localhost:8002/docs || echo "Error"
 
     - name: Run tests
-      run: docker compose up --abort-on-container-exit \
+      run: docker compose up -d \
+             mysql-db mysql-content mysql-ai mysql-code-exec \
              gensoft_infraestructure-user-management-service-test-1 \
              gensoft_infraestructure-sandbox-test-1 \
              gensoft_infraestructure-ai-assistance-service-test-1 \
              gensoft_infraestructure-content-management-service-test-1
 
     - name: Show logs
-      run: docker compose logs
+      run: run: |
+        set -e
+        SERVICES=(
+          gensoft_infraestructure-user-management-service-test-1
+          gensoft_infraestructure-sandbox-test-1
+          gensoft_infraestructure-ai-assistance-service-test-1 
+          gensoft_infraestructure-content-management-service-test-1
+        )
+        for SERVICE in "${SERVICES[@]}"; do
+          echo "========== Logs for $SERVICE =========="
+          docker-compose logs "$SERVICE"
+          EXIT_CODE=$(docker inspect "$SERVICE" --format='{{.State.ExitCode}}')
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "❌ Test failed in $SERVICE (exit code: $EXIT_CODE)"
+            exit 1
+          else
+            echo "✅ $SERVICE passed tests"
+          fi
+        done
 
     - name: Tear down
       run: docker compose down
