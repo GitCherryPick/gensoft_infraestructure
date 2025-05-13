@@ -1,6 +1,9 @@
 from fastapi import FastAPI
+from app.database import engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import student_stats, api_ai
+from app.model.base import Base
+import app.model
 
 app = FastAPI()
 
@@ -11,6 +14,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def root():

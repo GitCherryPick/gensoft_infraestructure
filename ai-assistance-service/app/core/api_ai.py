@@ -1,8 +1,10 @@
+from typing import Dict
 from app.schema.ai_question import AIQuestion, AIResponse
 from google import genai
 from google.genai import types
 import os
 
+chat_sessions: Dict[str, any] = {}
 api_key_gensoft = os.getenv('AI_API_KEY')
 
 if not api_key_gensoft:
@@ -31,4 +33,37 @@ def ask_ai(question_text: str):
         return {
             "answer":str(e),
             "status":"error",
+        }
+    
+def conversate_ai(user_id: int, question_text: str):
+    """
+    Conversing with an AI model.
+    """
+    try:
+        if user_id not in chat_sessions:
+            client = genai.Client(api_key=api_key_gensoft)
+            chat = client.chats.create(
+                model="gemini-2.0-flash",
+            )
+            chat_sessions[user_id] = chat
+        else:
+            chat = chat_sessions[user_id]
+
+        response = chat.send_message_stream(question_text)
+        message_show = ""
+        for chunk in response:
+            if chunk.text:
+                message_show += chunk.text
+            
+        return {
+            "status": "success",
+            "question": question_text,
+            "answer": message_show
+        }
+    except Exception as e:
+        print(f"Error al llamar a la API-gemini: {e}")
+        return {
+            "status": "error",
+            "question": "Fallido",
+            "answer": f"Error {e}"
         }
