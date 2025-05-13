@@ -5,13 +5,13 @@ from datetime import datetime
 class StudentStatsBase(BaseModel):
     student_id: int
     total_activities_answered: Optional[int] = 0
-    common_mistakes: Optional[Dict[str, Any]] = {}
+    common_mistakes: Optional[List[str]] = []
     interests: Optional[List[str]] = []
     performance_stats: Optional[Dict[str, Any]] = None
 
     @validator("common_mistakes", pre=True, always=True)
     def validate_common_mistakes(cls, value):
-        if value is not None and not isinstance(value, dict):
+        if value is not None and not all(isinstance(i, str) for i in value):
             raise ValueError("common_mistakes must be a dictionary")
         return value
 
@@ -34,7 +34,7 @@ class StudentStatsRequest(StudentStatsBase):
 
 class StudentStatsUpdateRequest(BaseModel):
     total_activities_answered: Optional[int]
-    common_mistakes: Optional[Dict[str, Any]]
+    common_mistakes: Optional[List[str]]
     interests: Optional[List[str]]
     performance_stats: Optional[Dict[str, Any]]
 
