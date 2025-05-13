@@ -263,6 +263,8 @@ services:
       AI_ASSISTANCE_URL: http://ai-assistance-service:8005
       CONTENT_MANAGEMENT_URL: http://content-management-service:8003
     restart: on-failure
+    networks:
+      - gensoft-network
   
 volumes:
   mysql_user_data:
