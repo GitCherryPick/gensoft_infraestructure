@@ -60,10 +60,10 @@ jobs:
 
     - name: Run tests
       run: docker compose up --abort-on-container-exit \
-             user-management-service-test \
-             sandbox-test \
-             ai-assistance-service-test \
-             content-management-service-test
+             gensoft_infraestructure-user-management-service-test-1 \
+             gensoft_infraestructure-sandbox-test-1 \
+             gensoft_infraestructure-ai-assistance-service-test-1 \
+             gensoft_infraestructure-content-management-service-test-1
 
     - name: Show logs
       run: docker compose logs
