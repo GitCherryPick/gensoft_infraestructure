@@ -60,7 +60,6 @@ jobs:
 
     - name: Run tests
       run: docker compose up -d \
-             mysql-db mysql-content mysql-ai mysql-code-exec \
              gensoft_infraestructure-user-management-service-test-1 \
              gensoft_infraestructure-sandbox-test-1 \
              gensoft_infraestructure-ai-assistance-service-test-1 \
