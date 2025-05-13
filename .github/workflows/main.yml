@@ -58,21 +58,17 @@ jobs:
     - name: sandbox works
       run: curl http://localhost:8002/docs || echo "Error"
 
-    - name: Run tests
-      run: docker compose up -d \
-             gensoft_infraestructure-user-management-service-test-1 \
-             gensoft_infraestructure-sandbox-test-1 \
-             gensoft_infraestructure-ai-assistance-service-test-1 \
-             gensoft_infraestructure-content-management-service-test-1
+    - name: Prepare tests
+      run: docker compose config --services
 
-    - name: Show logs
+    - name: Show logs for testing
       run: |
         set -e
         SERVICES=(
-          gensoft_infraestructure-user-management-service-test-1
-          gensoft_infraestructure-sandbox-test-1
-          gensoft_infraestructure-ai-assistance-service-test-1 
-          gensoft_infraestructure-content-management-service-test-1
+          user-management-service-test
+          sandbox-test
+          ai-assistance-service-test 
+          content-management-service-test
         )
         for SERVICE in "${SERVICES[@]}"; do
           docker-compose logs "$SERVICE"
