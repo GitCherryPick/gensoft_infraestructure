@@ -35,13 +35,64 @@ bash
 
 Configurar variables de entorno
 Crear un archivo .env con las siguientes variables (ajusta según tu configuración)
+ 
+# GLOBAL 
+# Archivo .env para las predenciales
+DB_PORT=3306
+MYSQL_ROOT_PASSWORD=password
+
+USER_DB_HOST=mysql-db
+USER_DB_NAME=user_db
+USER_DB_NAME_TEST=user_db_test
+USER_DB_USER=app_user
+USER_DB_PASSWORD=user_pass
+
+CONTENT_DB_HOST=mysql-content
+CONTENT_DB_NAME=content_db
+CONTENT_DB_NAME_TEST=content_db_test
+CONTENT_DB_USER=content_user
+CONTENT_DB_PASSWORD=content_pass
+
+AI_DB_HOST=mysql-ai
+AI_DB_NAME=ai_db
+AI_DB_NAME_TEST=ai_db_test
+AI_DB_USER=ai_user
+AI_DB_PASSWORD=ai_pass
+AI_API_KEY=AIzaSyDFL5k8ZvJmrrz2BHhcfqXrmk66VKRdnnM
+
+CODE_DB_HOST=mysql-code-exec
+CODE_DB_NAME=code_db
+CODE_DB_NAME_TEST=code_db_test
+CODE_DB_USER=code_user
+CODE_DB_PASSWORD=code_pass
+
+EMAIL_HOST=smtp.sendgrid.net
+EMAIL_USERNAME=apikey  
+EMAIL_PASSWORD=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
+EMAIL_FROM=judith.margarita.paco@hotmail.com
+
 
 # Ejecutar la aplicación
+### Antes de la ejecición se debe abrir docker desktop
 	uvicorn app.main:app --reload
 
-Para ejecutar con Docker:
+## Para ejecutar con Docker:
+### User-service
 Accede a la documentación automática de la API en:
  http://localhost:8000/docs
+
+ ### IA-assistance
+Accede a la documentación automática de la API en:
+ http://localhost:8005/docs
+
+ ### sandbox
+Accede a la documentación automática de la API en:
+ http://localhost:8002/docs
+
+ ### User-managerment
+Accede a la documentación automática de la API en:
+ http://localhost:8006/docs
+
  
 ## Acceso al Proyecto
 Repositorio del Backend:
