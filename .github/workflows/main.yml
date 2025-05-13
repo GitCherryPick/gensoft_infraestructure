@@ -71,7 +71,7 @@ jobs:
           content-management-service-test
         )
         for SERVICE in "${SERVICES[@]}"; do
-          docker-compose logs "$SERVICE"
+          docker compose logs "$SERVICE"
           EXIT_CODE=$(docker inspect "$SERVICE" --format='{{.State.ExitCode}}')
           if [ "$EXIT_CODE" -ne 0 ]; then
             echo "❌ Test failed in $SERVICE (exit code: $EXIT_CODE)"
