@@ -1,0 +1,14 @@
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, TIMESTAMP
+from datetime import datetime
+from sqlalchemy.orm import relationship
+from app.model.base import Base 
+
+class Tasks(Base):
+    __tablename__ = "tasks"
+
+    id = Column(Integer, primary_key=True, autoincrement = True)
+    title = Column(String(30), unique = True, nullable = False)
+    enunciado = Column(String(255), unique = True, nullable = False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    tests = relationship("Tests", backref="task", cascade="all, delete-orphan")

@@ -3,9 +3,10 @@ import tempfile
 import os
 
 def run_code(code: str):
-    with open("temp_script.py", "w") as f:
-        f.write(code)
-    result = subprocess.run(["python", "temp_script.py"], capture_output=True, text=True, timeout=3)
+    with tempfile.NamedTemporaryFile("w+", suffix=".py", delete=False) as tmp:
+        tmp.write(code)
+        tmp.flush()
+    result = subprocess.run(["python", tmp.name], capture_output=True, text=True, timeout=3)
 
     return result.stdout, result.stderr
 

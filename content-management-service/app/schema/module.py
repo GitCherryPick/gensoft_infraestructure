@@ -11,11 +11,15 @@ class ModuleBase(BaseModel):
 class ModuleCreate(ModuleBase):
     pass
 
-class ModuleUpdate(ModuleBase):
-    pass
+class ModuleUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    level: Optional[str] = None
+    module_order: Optional[int] = None
+    course_id: Optional[int] = None
 
-class Module(ModuleBase):
+class ModuleOut(ModuleBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True 
