@@ -89,3 +89,7 @@ jobs:
             echo "✅ $SERVICE passed tests"
           fi
         done
+
+    - name: Tear down
+      run: docker compose down
+
