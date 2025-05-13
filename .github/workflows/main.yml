@@ -1,0 +1,77 @@
+name: CI - GitCherryPick
+
+on:
+  push:
+    branches:
+      - main
+      - 'sprint/**'
+  pull_request:
+    branches:
+      - main
+      - 'sprint/**'
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Create .env with secrets
+      run: |
+        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+        echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+        echo "USER_DB_HOST=${{secrets.USER_DB_HOST }}" >> .env
+        echo "USER_DB_NAME=${{ secrets.USER_DB_NAME }}" >> .env
+        echo "USER_DB_NAME_TEST=${{ secrets.USER_DB_NAME_TEST }}" >> .env
+        echo "USER_DB_USER=${{ secrets.USER_DB_USER }}" >> .env
+        echo "USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}" >> .env
+        echo "CONTENT_DB_HOST=${{ secrets.CONTENT_DB_HOST }}" >> .env
+        echo "CONTENT_DB_NAME=${{ secrets.CONTENT_DB_NAME }}" >> .env
+        echo "CONTENT_DB_NAME_TEST=${{ secrets.CONTENT_DB_NAME_TEST }}" >> .env
+        echo "CONTENT_DB_USER=${{ secrets.CONTENT_DB_USER }}" >> .env
+        echo "CONTENT_DB_PASSWORD=${{ secrets.CONTENT_DB_PASSWORD }}" >> .env
+        echo "AI_DB_HOST=${{ secrets.AI_DB_HOST }}" >> .env
+        echo "AI_DB_NAME=${{ secrets.AI_DB_NAME }}" >> .env
+        echo "AI_DB_NAME_TEST=${{ secrets.AI_DB_NAME_TEST }}" >> .env
+        echo "AI_DB_USER=${{ secrets.AI_DB_USER }}" >> .env
+        echo "AI_DB_PASSWORD=${{ secrets.AI_DB_PASSWORD }}" >> .env
+        echo "AI_API_KEY=${{ secrets.AI_API_KEY }}" >> .env
+        echo "CODE_DB_HOST=${{ secrets.CODE_DB_HOST }}" >> .env
+        echo "CODE_DB_NAME=${{ secrets.CODE_DB_NAME }}" >> .env
+        echo "CODE_DB_NAME_TEST=${{ secrets.CODE_DB_NAME_TEST }}" >> .env
+        echo "CODE_DB_USER=${{ secrets.CODE_DB_USER }}" >> .env
+        echo "CODE_DB_PASSWORD=${{ secrets.CODE_DB_PASSWORD }}" >> .env
+        echo "EMAIL_HOST=${{ secrets.EMAIL_HOST }}" >> .env
+        echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> .env
+        echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
+        echo "EMAIL_FROM=${{ secrets.EMAIL_FROM }}" >> .env
+
+    - name: Verify docker-compose
+      run: docker compose version
+
+    - name: Build microservices
+      run: docker compose up --build -d
+
+    - name: Wait microservices running
+      run: |
+        sleep 20
+        docker ps
+
+    - name: sandbox works
+      run: curl http://localhost:8002/docs || echo "Error"
+
+    - name: Run tests
+      run: docker-compose up --abort-on-container-exit \
+             user-management-service-test \
+             sandbox-test \
+             ai-assistance-service-test \
+             content-management-service-test
+
+    - name: Show logs
+      run: docker compose logs
+
+    - name: Tear down
+      run: docker compose down
+        
