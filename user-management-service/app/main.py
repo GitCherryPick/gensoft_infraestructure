@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app.database import SessionLocal, engine
-from app.model import User, StudentTransfer, Institution, Role, UserRole, StudentTransfer 
+from app.model import User, StudentTransfer, Institution, Role, UserRoles, StudentTransfer 
 from app.schema.users import UserCreate, UserResponse
 from app.schema.institutions import InstitutionCreate, InstitutionResponse
 from app.schema.student_transfers import StudentTransferCreate, StudentTransferResponse
