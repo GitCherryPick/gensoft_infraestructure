@@ -59,7 +59,7 @@ jobs:
       run: curl http://localhost:8002/docs || echo "Error"
 
     - name: Run tests
-      run: docker-compose up --abort-on-container-exit \
+      run: docker compose up --abort-on-container-exit \
              user-management-service-test \
              sandbox-test \
              ai-assistance-service-test \
