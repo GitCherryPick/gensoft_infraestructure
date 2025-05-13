@@ -108,6 +108,7 @@ def enviar(submission: Submission, db: Session = Depends(get_db)):
     id = task_i.id
 
     test_cases = task_i.tests
+    generalVeredict = "Accepted"
 
     for test_case in test_cases:
         result = execute_code(CodeInput2(code=submission.code, call=test_case.input))
@@ -122,13 +123,20 @@ def enviar(submission: Submission, db: Session = Depends(get_db)):
             veredict = "Wrong Answer"
             error = ""
 
+        if veredict != "Accepted":
+            generalVeredict = "Error"
+
         veredicts.append({
             "veredict": veredict,
-            "error": error
+            "error": error,
+            "input": test_case.input,
+            "expectedOutput": test_case.output.rstrip('\n'),
+            "output": result["output"].rstrip('\n')
         })
-
-
         
 
 
-    return veredicts
+    return {
+        "generalVeredict": generalVeredict,
+        "testCases": veredicts
+    }
