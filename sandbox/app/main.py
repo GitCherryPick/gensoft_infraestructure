@@ -4,6 +4,8 @@ from app.api import executor
 from app.api import tasks
 from app.database import engine
 from app.model.base import Base
+from app.api.submissions import router as submissions_router
+
 
 app = FastAPI()
 
@@ -18,9 +20,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
+
 @app.get("/")
 def root():
     return {"message": "Hi World from Sandbox!"}
 
 app.include_router(executor.router, tags=["executor"])
 app.include_router(tasks.router, tags=["tasks"])
+app.include_router(submissions_router, tags=["submissions"])

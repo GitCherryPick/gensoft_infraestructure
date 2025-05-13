@@ -3,11 +3,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-DB_HOST = os.getenv('DB_HOST', 'mysql-content')
-DB_PORT = os.getenv('DB_PORT', '3306')
-DB_NAME = os.getenv('DB_NAME', 'content_db_test')
-DB_USER = os.getenv('DB_USER', 'content_user')
-DB_PASSWORD = os.getenv('DB_PASSWORD', 'content_pass')
+DB_HOST = os.getenv('CONTENT_DB_HOST')
+DB_PORT = os.getenv('DB_PORT')
+DB_NAME = os.getenv('CONTENT_DB_NAME_TEST')
+DB_USER = os.getenv('CONTENT_DB_USER')
+DB_PASSWORD = os.getenv('CONTENT_DB_PASSWORD')
 
 SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
