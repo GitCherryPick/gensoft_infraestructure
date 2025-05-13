@@ -65,12 +65,13 @@ jobs:
       run: |
         set -e
         SERVICES=(
+          ai-assistance-service-test
           user-management-service-test
-          sandbox-test
-          ai-assistance-service-test 
+          sandbox-test 
           content-management-service-test
         )
         for SERVICE in "${SERVICES[@]}"; do
+          docker compose restart "$SERVICE"
           docker compose restart "$SERVICE"
           docker compose logs "$SERVICE"
           EXIT_CODE=$(docker inspect "$SERVICE" --format='{{.State.ExitCode}}')

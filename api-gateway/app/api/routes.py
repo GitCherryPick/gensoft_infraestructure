@@ -36,11 +36,10 @@ async def delete_user(user_username: str):
         response = await client.delete(f"{USER_MANAGEMENT_URL}/users/{user_username}")
         return response.json()
 
-@router.post("/users")
+@router.post("/users/")
 async def create_user(user_data: dict):
     async with httpx.AsyncClient() as client:
         response = await client.post(f"{USER_MANAGEMENT_URL}/users", json=user_data)
-        
         try:
             return response.json()
         except Exception:
