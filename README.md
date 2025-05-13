@@ -25,10 +25,6 @@
 	git clone https://github.com/GitCherryPick/gensoft_infraestructure.git
 	cd gensoft_infraestructure
 
-# Crear un entorno virtual 
-	python -m venv venv
-	source venv/bin/activate  # Linux/Mac
-	venv\Scripts\activate     # Windows	
 
 # Instalar dependencias
 
