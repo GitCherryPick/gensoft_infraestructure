@@ -67,7 +67,7 @@ jobs:
              gensoft_infraestructure-content-management-service-test-1
 
     - name: Show logs
-      run: run: |
+      run: |
         set -e
         SERVICES=(
           gensoft_infraestructure-user-management-service-test-1
@@ -76,7 +76,6 @@ jobs:
           gensoft_infraestructure-content-management-service-test-1
         )
         for SERVICE in "${SERVICES[@]}"; do
-          echo "========== Logs for $SERVICE =========="
           docker-compose logs "$SERVICE"
           EXIT_CODE=$(docker inspect "$SERVICE" --format='{{.State.ExitCode}}')
           if [ "$EXIT_CODE" -ne 0 ]; then
