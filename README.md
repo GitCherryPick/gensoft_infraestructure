@@ -19,23 +19,10 @@
 
 ## Demostración
 
-	Para ejecutar el backend localmente:
-	bash
 # Clonar el repositorio
 	git clone https://github.com/GitCherryPick/gensoft_infraestructure.git
 	cd gensoft_infraestructure
 
-
-# Instalar dependencias
-
-	pip install -r requirements.txt
-
-#### En caso de un fallo normalmente se ejecuta:
-
-	python.exe -m pip install --upgrade pip
-
-Configurar variables de entorno
-Crear un archivo .env con las siguientes variables (ajusta según tu configuración)
 
 # Ejecutar la aplicación
 ### Antes de la ejecición se debe abrir docker desktop
