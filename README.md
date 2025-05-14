@@ -12,37 +12,40 @@
 
 ## Estado del Proyecto
 
-En desarrollo activo. Actualmente en Sprint 01, enfocados en:
+	En desarrollo activo. Actualmente en Sprint 01, enfocados en:
 	Implementación de autenticación de usuarios.
 	Gestión de perfiles y datos de usuarios.
 	Integración del simulador de código en un entorno seguro.
 
 ## Demostración
 
-Para ejecutar el backend localmente:
-bash
 # Clonar el repositorio
 	git clone https://github.com/GitCherryPick/gensoft_infraestructure.git
 	cd gensoft_infraestructure
 
-# Crear un entorno virtual (opcional pero recomendado)
-	python -m venv venv
-	source venv/bin/activate  # Linux/Mac
-	venv\Scripts\activate     # Windows
-
-# Instalar dependencias
-	pip install -r requirements.txt
-
-Configurar variables de entorno
-Crear un archivo .env con las siguientes variables (ajusta según tu configuración)
 
 # Ejecutar la aplicación
+### Antes de la ejecición se debe abrir docker desktop
 	uvicorn app.main:app --reload
 
-Para ejecutar con Docker:
+## Para ejecutar con Docker:
+### User-service
 Accede a la documentación automática de la API en:
  http://localhost:8000/docs
- 
+
+ ### IA-assistance
+Accede a la documentación automática de la API en:
+ http://localhost:8005/docs
+
+ ### sandbox
+Accede a la documentación automática de la API en:
+ http://localhost:8002/docs
+
+ ### User-managerment
+Accede a la documentación automática de la API en:
+ http://localhost:8006/docs
+
+
 ## Acceso al Proyecto
 Repositorio del Backend:
  https://github.com/GitCherryPick/gensoft_infraestructure
