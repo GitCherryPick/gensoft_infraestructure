@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.model.code_task import CodeTask
-from app.schema.code_task import TaskRequest
+from app.schema.code_task import TaskRequest, StudentReply
 
 
 def get_code_task(db: Session, id: int):
@@ -37,3 +37,43 @@ def delete_code_task(db: Session, id: int):
         db.delete(db_rep_task)
         db.commit()
     return db_rep_task
+
+def submit_code(db: Session, submission: StudentReply):
+    task_replicator = db.query(CodeTask).filter(CodeTask.id == submission.task_replicator_id).first()
+    if not task_replicator:
+        return {"error": "Tarea de replicacion no encontrada"}
+    
+    if submission.student_code.strip() == task_replicator.expected_code.strip():
+        return {"result": "Tarea completada con exito"}
+    else:
+        task_lines = task_replicator.expected_code.strip().splitlines()
+        student_lines = submission.student_code.strip().splitlines()
+
+        errors = []
+        for i, (t_line, s_line) in enumerate(zip(task_lines, student_lines)):
+            if t_line.strip() != s_line.strip():
+                errors.append({
+                    "line": i + 1,
+                    "expected": t_line,
+                    "got": s_line
+                })
+
+        if len(student_lines) != len(task_lines):
+            errors.append({
+                "message": "Hace falta que repliques correctamente",
+                "expected_lines": len(task_lines),
+                "got_lines": len(student_lines)
+            })
+
+        return {"result": "Incorrecto", "details": errors}
+
+def get_template(db: Session, task_id: int):
+    task = db.query(CodeTask).filter(CodeTask.id == task_id).first()
+
+    if not task:
+        return {"error": "Tarea no encontrada"}
+
+    if task.template_code:
+        return {"template_code": task.template_code}
+    else:
+        return {"message": "No hay plantilla, la tarea es de escritura completa."}

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from app.database import get_db
-from app.schema.code_task import TaskRequest, TaskResponse
+from app.schema.code_task import TaskRequest, TaskResponse, StudentReply
 from app.model.code_task import CodeTask
 from app.services import code_tasks as replicator
 
@@ -41,5 +41,16 @@ def delete(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No se puede eliminar la tarea con ese id")
     return deleted
 
+@router.post("/codereplicated/")
+def submit_code(submission: StudentReply, db: Session = Depends(get_db)):
+    task_answer = replicator.submit_code(db, submission)
+    if not task_answer:
+        raise HTTPException(status_code=404, detail="No se puede enviar la tarea")
+    return task_answer
 
-    
+@router.get("/taskcode/{id}/template")
+def get_template(id: int, db: Session = Depends(get_db)):
+    task = replicator.get_template(db, id)
+    if not task:
+        raise HTTPException(status_code=404, detail="No se encuentra la tarea con el id")
+    return task

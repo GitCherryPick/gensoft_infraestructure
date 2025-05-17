@@ -18,3 +18,7 @@ class TaskResponse(TaskBase):
 
     class Config:
         from_attributes = True
+
+class StudentReply(BaseModel):
+    task_replicator_id: int
+    student_code: str
