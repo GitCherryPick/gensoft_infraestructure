@@ -60,7 +60,6 @@ def seed_data():
             }
         ]
         
-        # Diccionario para almacenar los IDs de los módulos
         modulos_ids = {}
         
         for modulo_data in modulos:
@@ -86,7 +85,6 @@ def seed_data():
                 
                 modulos_ids[modulo_data["title"]] = nuevo_modulo.id
         
-        # Contenidos para cada módulo
         contenidos = [
             {
                 "module_title": "Tipos de Datos y Variables",
@@ -189,7 +187,6 @@ def seed_data():
                     "A través de ejemplos prácticos, el estudiante aprenderá a identificar riesgos, manejar errores sin comprometer la estabilidad del programa, y mejorar la experiencia del usuario frente a fallos."
                 )
             },
-            # Contenidos PDF para cada módulo
             {
                 "module_title": "Tipos de Datos y Variables",
                 "title": None,
@@ -212,7 +209,7 @@ def seed_data():
                 "content_type": "pdf",
                 "content": None,
                 "video_url": None,
-                "file_path": "storage/pdf/example_3_1.pdf",
+                "file_path": "storage/pdf/example_1_1.pdf",
             },
             {
                 "module_title": "Estructuras de Datos",
@@ -220,7 +217,7 @@ def seed_data():
                 "content_type": "pdf",
                 "content": None,
                 "video_url": None,
-                "file_path": "storage/pdf/example_4_1.pdf",
+                "file_path": "storage/pdf/example_2_1.pdf",
             },
             {
                 "module_title": "Manejo de Errores",
@@ -228,9 +225,8 @@ def seed_data():
                 "content_type": "pdf",
                 "content": None,
                 "video_url": None,
-                "file_path": "storage/pdf/example_5_1.pdf",
+                "file_path": "storage/pdf/example_1_1.pdf",
             },
-            # Contenidos de video para cada módulo
             {
                 "module_title": "Tipos de Datos y Variables",
                 "title": "Video: Tipos de Datos y Variables",
@@ -244,7 +240,7 @@ def seed_data():
                 "title": "Video: Estructuras de Control",
                 "content_type": "video",
                 "content": None,
-                "video_url": "https://www.youtube.com/watch?v=LKFrQXaoSMQ",
+                "video_url": "https://www.youtube.com/watch?v=FvMPfrgGeKs",
                 "file_path": None,
             },
             {
@@ -252,7 +248,7 @@ def seed_data():
                 "title": "Video: Funciones",
                 "content_type": "video",
                 "content": None,
-                "video_url": "https://www.youtube.com/watch?v=LKFrQXaoSMQ",
+                "video_url": "https://www.youtube.com/watch?v=89cGQjB5R4M",
                 "file_path": None,
             },
             {
@@ -260,7 +256,7 @@ def seed_data():
                 "title": "Video: Estructuras de Datos",
                 "content_type": "video",
                 "content": None,
-                "video_url": "https://www.youtube.com/watch?v=LKFrQXaoSMQ",
+                "video_url": "https://www.youtube.com/watch?v=jzJlq35dQII&list=PLZPZq0r_RZON1eaqfafTnEexRzuHbfZX8&index=6",
                 "file_path": None,
             },
             {
@@ -268,23 +264,19 @@ def seed_data():
                 "title": "Video: Manejo de Errores",
                 "content_type": "video",
                 "content": None,
-                "video_url": "https://www.youtube.com/watch?v=LKFrQXaoSMQ",
+                "video_url": "https://www.youtube.com/watch?v=V_NXT2-QIlE",
                 "file_path": None,
             }
         ]
         
-        # Crear o actualizar los contenidos
         for contenido_data in contenidos:
             if contenido_data["module_title"] in modulos_ids:
                 module_id = modulos_ids[contenido_data["module_title"]]
-                
-                # Para contenidos PDF, verificamos por file_path en lugar de title
                 if contenido_data["content_type"] == "pdf":
                     existing_content = db.query(Content).filter(
                         Content.module_id == module_id,
                         Content.file_path == contenido_data["file_path"]
                     ).first()
-                # Para contenidos de video, verificamos por video_url
                 elif contenido_data["content_type"] == "video":
                     existing_content = db.query(Content).filter(
                         Content.module_id == module_id,
@@ -297,7 +289,6 @@ def seed_data():
                     ).first()
                 
                 if existing_content:
-                    # Actualizar el contenido existente
                     if contenido_data["content_type"] == "text":
                         existing_content.content = contenido_data["content"]
                     elif contenido_data["content_type"] == "pdf":
