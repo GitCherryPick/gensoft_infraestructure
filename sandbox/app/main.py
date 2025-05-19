@@ -1,14 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.api import executor
 from app.api import tasks
+from app.api import submissions
+
 from app.database import engine
 from app.model.base import Base
-from app.api.submissions import router as submissions_router
-
 
 app = FastAPI()
-
 
 Base.metadata.create_all(bind=engine)
 
@@ -30,4 +30,4 @@ def root():
 
 app.include_router(executor.router, tags=["executor"])
 app.include_router(tasks.router, tags=["tasks"])
-app.include_router(submissions_router, tags=["submissions"])
+app.include_router(submissions.router, tags=["submissions"])
