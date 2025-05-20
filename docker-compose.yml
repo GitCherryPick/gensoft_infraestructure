@@ -1,23 +1,316 @@
 services:
   mysql-db:
-    image: mysql:8
-    container_name: mysql-db
+    image: mysql:8.0.41
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${USER_DB_NAME}
+      MYSQL_USER: ${USER_DB_USER}
+      MYSQL_PASSWORD: ${USER_DB_PASSWORD}
+    volumes:
+      - mysql_user_data:/var/lib/mysql
+      - ./user-management-service/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3307:3306"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - gensoft-network
 
-  compiler_service:
-    image: compiler_service:latest
-    container_name: compiler_service
-    ports:
-      - "8001:8001"
+  mysql-content:
+    image: mysql:8.0.41
     environment:
-      DATABASE_URL: "${DATABASE_URL}"
-    
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${CONTENT_DB_NAME}
+      MYSQL_USER: ${CONTENT_DB_USER}
+      MYSQL_PASSWORD: ${CONTENT_DB_PASSWORD}
+    volumes:
+      - mysql_content_data:/var/lib/mysql
+      - ./content-management-service/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3308:3306"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - gensoft-network
 
-  
+  mysql-ai:
+    image: mysql:8.0.41
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${AI_DB_NAME}
+      MYSQL_USER: ${AI_DB_USER}
+      MYSQL_PASSWORD: ${AI_DB_PASSWORD}
+    volumes:
+      - mysql_ai_data:/var/lib/mysql
+      - ./ai-assistance-service/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3309:3306"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - gensoft-network
 
+  mysql-code-exec:
+    image: mysql:8.0.41
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${CODE_DB_NAME}
+      MYSQL_USER: ${CODE_DB_USER}
+      MYSQL_PASSWORD: ${CODE_DB_PASSWORD}
+    volumes:
+      - mysql_code_exec_data:/var/lib/mysql
+      - ./sandbox/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3310:3306"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - gensoft-network
+
+  user-management-service:
+    build: ./user-management-service
+    env_file:
+      - ./.env
+    ports:
+      - "8006:8006"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${USER_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${USER_DB_NAME}
+      DB_USER: ${USER_DB_USER} # Usa el usuario de aplicación
+      DB_PASSWORD: ${USER_DB_PASSWORD} # en lugar de root
+    restart: on-failure
+    volumes:
+      - ./user-management-service:/app
+    networks:
+      - gensoft-network
+
+  user-management-service-test:
+    build:
+      context: ./user-management-service
+    env_file:
+      - ./.env
+    command: pytest tests --disable-warnings
+    depends_on:
+      - mysql-db
+    environment:
+      DB_HOST: ${USER_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${USER_DB_NAME_TEST}
+      DB_USER: ${USER_DB_USER}
+      DB_PASSWORD: ${USER_DB_PASSWORD}
+    volumes:
+      - ./user-management-service:/app
+    networks:
+      - gensoft-network
+
+  sandbox:
+    build: ./sandbox
+    env_file:
+      - ./.env
+    ports:
+      - "8002:8002"
+    depends_on:
+      mysql-code-exec:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${CODE_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${CODE_DB_NAME}
+      DB_USER: ${CODE_DB_USER}
+      DB_PASSWORD: ${CODE_DB_PASSWORD}
+    restart: on-failure
+    volumes:
+      - ./sandbox:/app
+    networks:
+      - gensoft-network
+    pids_limit: 100
+    mem_limit: 256m
+    cpus: "0.5"
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+
+  sandbox-test:
+    build:
+      context: ./sandbox
+    env_file:
+      - ./.env
+    command: pytest tests --disable-warnings
+    depends_on:
+      - mysql-code-exec
+    environment:
+      DB_HOST: ${CODE_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${CODE_DB_NAME_TEST}
+      DB_USER: ${CODE_DB_USER}
+      DB_PASSWORD: ${CODE_DB_PASSWORD}
+    volumes:
+      - ./sandbox:/app
+    networks:
+      - gensoft-network
+
+  content-management-service:
+    build: ./content-management-service
+    env_file:
+      - ./.env
+    ports:
+      - "8003:8003"
+    depends_on:
+      mysql-content:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${CONTENT_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${CONTENT_DB_NAME}
+      DB_USER: ${CONTENT_DB_USER}
+      DB_PASSWORD: ${CONTENT_DB_PASSWORD}
+    restart: on-failure
+    volumes:
+      - ./content-management-service:/app
+    networks:
+      - gensoft-network
+
+  content-management-service-test:
+    build:
+      context: ./content-management-service
+    env_file:
+      - ./.env
+    command: pytest tests
+    depends_on:
+      - mysql-content
+    environment:
+      DB_HOST: ${CONTENT_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${CONTENT_DB_NAME_TEST}
+      DB_USER: ${CONTENT_DB_USER}
+      DB_PASSWORD: ${CONTENT_DB_PASSWORD}
+    volumes:
+      - ./content-management-service:/app
+    networks:
+      - gensoft-network
+
+  ai-assistance-service:
+    build: ./ai-assistance-service
+    env_file:
+      - ./.env
+    ports:
+      - "8005:8005"
+    depends_on:
+      mysql-ai:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${AI_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${AI_DB_NAME}
+      DB_USER: ${AI_DB_USER}
+      DB_PASSWORD: ${AI_DB_PASSWORD}
+    restart: on-failure
+    volumes:
+      - ./ai-assistance-service:/app
+    networks:
+      - gensoft-network
+
+  ai-assistance-service-test:
+    build:
+      context: ./ai-assistance-service
+    env_file:
+      - ./.env
+    command: pytest tests --disable-warnings
+    depends_on:
+      - mysql-ai
+    environment:
+      DB_HOST: ${AI_DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${AI_DB_NAME_TEST}
+      DB_USER: ${AI_DB_USER}
+      DB_PASSWORD: ${AI_DB_PASSWORD}
+    volumes:
+      - ./ai-assistance-service:/app
+    networks:
+      - gensoft-network
+
+  api-gateway:
+    build: ./api-gateway
+    env_file:
+      - ./.env
+    ports:
+      - "8010:8010"
+    environment:
+      USER_MANAGEMENT_URL: http://user-management-service:8006
+      SANDBOX_URL: http://sandbox:8002
+      AI_ASSISTANCE_URL: http://ai-assistance-service:8005
+      CONTENT_MANAGEMENT_URL: http://content-management-service:8003
+    restart: on-failure
+    networks:
+      - gensoft-network
+
+volumes:
+  mysql_user_data:
+  mysql_content_data:
+  mysql_ai_data:
+  mysql_code_exec_data:
+
+networks:
+  gensoft-network:
+    driver: bridge

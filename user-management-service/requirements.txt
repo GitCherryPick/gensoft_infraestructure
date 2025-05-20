@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+sqlalchemy
+pymysql
+pydantic
+cryptography
+httpx
+pytest
+pytest-asyncio
+bcrypt==3.2.2
+passlib==1.7.4
+python-jose
+email-validator
