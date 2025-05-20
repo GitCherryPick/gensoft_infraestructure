@@ -16,3 +16,4 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     student_transfer_rel = relationship("StudentTransfer", back_populates="user_rel")
+    grade_rel = relationship("Grade", back_populates="user_rel") # uselist=False

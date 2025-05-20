@@ -31,5 +31,4 @@ def test_create_user():
 
 def test_delete_user():
     response = client.delete("/users/testuser3")
-    assert response.status_code == 200
-    
+    assert response.status_code == 204
