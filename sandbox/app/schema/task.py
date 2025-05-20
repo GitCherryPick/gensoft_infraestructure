@@ -14,7 +14,7 @@ class Test(TestBase):
     task_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TaskBase(BaseModel):
     title: str
@@ -29,7 +29,7 @@ class Task(TaskBase):
     tests: List[Test] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TaskUpdate(BaseModel):
     title: str

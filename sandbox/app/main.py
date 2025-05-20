@@ -7,6 +7,7 @@ from app.api import code_tasks
 from app.api import submissions
 from app.database import engine
 from app.model.base import Base
+from app.seed import seed_task_replicators
 
 app = FastAPI()
 
@@ -23,6 +24,7 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
+    seed_task_replicators()
 
 @app.get("/")
 def root():
