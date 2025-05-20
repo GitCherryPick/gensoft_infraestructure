@@ -5,3 +5,4 @@ from .student_transfers import StudentTransfer
 from .roles import Role
 from .user_roles import UserRoles
 from .student_transfers import StudentTransfer
+from .grade import Grade

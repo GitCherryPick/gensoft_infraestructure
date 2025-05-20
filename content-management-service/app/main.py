@@ -7,7 +7,11 @@ from app.model.base import Base
 from app.api import courses, modules, contents
 from fastapi.staticfiles import StaticFiles
 
+import seed
+
 Base.metadata.create_all(bind=engine)
+
+seed.seed_data()
 
 app = FastAPI(
     title="Content Management API",
@@ -35,7 +39,6 @@ def root():
 def paila():
     return 124
 
-# Incluir routers
 app.include_router(courses.router, prefix="/courses", tags=["courses"])
 app.include_router(modules.router, prefix="/modules", tags=["modules"])
 app.include_router(contents.router, prefix="/contents", tags=["contents"])

@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
+
 class Submission(BaseModel):
     UserId: Optional[int] = None
     code: str
     taskId: int
-from datetime import datetime
-from typing import Optional
 
 class SubmissionBase(BaseModel):
     user_id: int
