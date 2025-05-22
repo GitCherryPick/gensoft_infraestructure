@@ -25,6 +25,9 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_task)
 
+    print("llego aqui")
+    print(task.tests)
+
     for test in task.tests:
         db_test = Tests(task_id=db_task.id, input=test.input, output=test.output)
         db.add(db_test)
