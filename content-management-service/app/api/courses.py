@@ -118,7 +118,7 @@ def get_default_course_id(db: Session = Depends(get_db)):
     Si no existe, lo crea y devuelve su ID.
     """
     try:
-        default_title = "Introduccion a la programacion"
+        default_title = "Introducción a la Programación"
         
         default_course = db.query(Course).filter(Course.title == default_title).first()
         
