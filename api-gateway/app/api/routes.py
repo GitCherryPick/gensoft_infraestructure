@@ -233,46 +233,31 @@ async def run_python_code(code_data: dict):
 async def execute_python_function(execution_data: dict):
     return await call_service("sandbox", "POST", "/execute", data=execution_data)
 
-@router.get("/sandbox/results/{execution_id}")
-async def get_execution_result(execution_id: str):
-    return await call_service("sandbox", "GET", f"/results/{execution_id}")
-
 # Task Management Endpoints
-@router.post("/sandbox/tasks")
+@router.post("/tasks")
 async def create_coding_task(task_data: dict):
     return await call_service("sandbox", "POST", "/tasks", data=task_data)
 
-@router.get("/sandbox/tasks")
+@router.get("/tasks")
 async def list_coding_tasks(skip: int = 0, limit: int = 10):
     return await call_service("sandbox", "GET", "/tasks", params={"skip": skip, "limit": limit})
 
-@router.get("/sandbox/tasks/{task_id}")
+@router.get("/tasks/{task_id}")
 async def get_coding_task(task_id: int):
     return await call_service("sandbox", "GET", f"/tasks/{task_id}")
 
-@router.put("/sandbox/tasks/{task_id}")
+@router.put("/tasks/{task_id}")
 async def update_coding_task(task_id: int, task_update: dict):
     return await call_service("sandbox", "PUT", f"/tasks/{task_id}", data=task_update)
 
-@router.delete("/sandbox/tasks/{task_id}")
+@router.delete("/tasks/{task_id}")
 async def delete_coding_task(task_id: int):
     return await call_service("sandbox", "DELETE", f"/tasks/{task_id}")
 
 # Submission Endpoints
-@router.post("/sandbox/submit")
+@router.post("/enviar")
 async def submit_solution(submission_data: dict):
-    return await call_service("sandbox", "POST", "/submit", data=submission_data)
-
-@router.get("/sandbox/submissions/{submission_id}")
-async def get_submission(submission_id: int):
-    return await call_service("sandbox", "GET", f"/submissions/{submission_id}")
-
-@router.get("/sandbox/tasks/{task_id}/submissions")
-async def get_task_submissions(task_id: int, user_id: Optional[int] = None, skip: int = 0, limit: int = 10):
-    params = {"skip": skip, "limit": limit}
-    if user_id:
-        params["user_id"] = user_id
-    return await call_service("sandbox", "GET", f"/tasks/{task_id}/submissions", params=params)
+    return await call_service("sandbox", "POST", "/enviar", data=submission_data)
 
 # Test Case Management
 @router.post("/sandbox/tasks/{task_id}/tests")
