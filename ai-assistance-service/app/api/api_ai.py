@@ -19,12 +19,12 @@ def ask_ai(ai_question: AIQuestion):
     response = ask_ai_core(ai_question.question)
     return response
 
-@router.post("/ask-feedback/replicator", response_model=ReplicatedFeedback)
-def ask_ai_feedback_replicator(ai_question: str):
+@router.post("/ask-feedback/replicator")
+def ask_ai_feedback_replicator(ai_question: AIQuestion):
     """
     Asking a question for replicated code support.
     """
-    response = ask_ai_feedback_rep(ai_question)
+    response = ask_ai_feedback_rep(ai_question.question)
     if not response:
         raise HTTPException(status_code=418, detail="Bad connection with ai-assistance-ms")
     return response

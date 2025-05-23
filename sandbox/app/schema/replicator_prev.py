@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 class ResultReplicator(BaseModel):
@@ -8,3 +9,13 @@ class ResultReplicator(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ReplicatedFeedback(BaseModel):
+    errores_sintacticos: List[str]
+    estructura_igual_a_objetivo: bool 
+    puntaje_similitud: float
+    diferencias_detectadas: List[str] 
+    pistas_generadas: List[str] 
+
+    class Config:
+        from_attributes = True 

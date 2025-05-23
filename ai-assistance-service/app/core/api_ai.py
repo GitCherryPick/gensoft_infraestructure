@@ -40,26 +40,17 @@ def ask_ai_feedback_rep(question_text: str):
     """
     Asking a question to an AI model.
     """
-    try:
-        client = genai.Client(api_key=api_key_gensoft)
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=question_text,
-            config={
-                "response_mime_type": "application/json",
-                "response_schema": ReplicatedFeedback
-            }
-        )
-        return {
-            "answer":response.text,
-            "status":"success",
+    client = genai.Client(api_key=api_key_gensoft)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=question_text,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": ReplicatedFeedback
         }
-    except Exception as e:
-        print(f"Error al llamar a la API-gemini: {e}")
-        return {
-            "answer":str(e),
-            "status":"error",
-        }
+    )
+    print(response.text)
+    return response.text
     
 def conversate_ai(user_id: int, question_text: str):
     """
