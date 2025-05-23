@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine
 from app.model.base import Base
 
-from app.api import courses, modules, contents
+from app.api import courses, modules, contents, exercises
 from fastapi.staticfiles import StaticFiles
 
 import seed
@@ -42,3 +42,4 @@ def paila():
 app.include_router(courses.router, prefix="/courses", tags=["courses"])
 app.include_router(modules.router, prefix="/modules", tags=["modules"])
 app.include_router(contents.router, prefix="/contents", tags=["contents"])
+app.include_router(exercises.router, prefix="/exercises", tags=["exercises"])

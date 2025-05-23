@@ -220,6 +220,10 @@ async def update_module(module_id: int, module_data: dict):
 async def delete_module(module_id: int):
     return await call_service("content", "DELETE", f"/modules/{module_id}")
 
+# Module Endpoints (Content Management)
+@router.post("/exercises/")
+async def create_exercise(exercise_data: dict):
+    return await call_service("content", "POST", "/exercises/", data=exercise_data)
 
 # sandbox service
 # sandbox service
