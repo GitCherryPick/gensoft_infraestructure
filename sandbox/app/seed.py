@@ -5,6 +5,11 @@ from app.database import SessionLocal
 def seed_task_replicators():
     db: Session = SessionLocal()
 
+    if db.query(CodeTask).first(): 
+        print("Seed omitido.")
+        db.close()
+        return
+
     tasks = [
         CodeTask(
             title="Condicional if",

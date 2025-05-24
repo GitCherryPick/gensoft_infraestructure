@@ -3,6 +3,8 @@ from app.schema.ai_question import AIQuestion, AIResponse
 from google import genai
 from google.genai import types
 import os
+from typing import Union
+from app.schema.ai_feedback import ReplicatedFeedback, LabFeedback
 
 chat_sessions: Dict[str, any] = {}
 api_key_gensoft = os.getenv('AI_API_KEY')
@@ -34,6 +36,21 @@ def ask_ai(question_text: str):
             "answer":str(e),
             "status":"error",
         }
+def ask_ai_feedback_rep(question_text: str):
+    """
+    Asking a question to an AI model.
+    """
+    client = genai.Client(api_key=api_key_gensoft)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=question_text,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": ReplicatedFeedback
+        }
+    )
+    print(response.text)
+    return response.text
     
 def conversate_ai(user_id: int, question_text: str):
     """
