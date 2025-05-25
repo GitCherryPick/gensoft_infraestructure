@@ -49,7 +49,6 @@ def ask_ai_feedback_rep(question_text: str):
             "response_schema": ReplicatedFeedback
         }
     )
-    print(response.text)
     return response.text
     
 def conversate_ai(user_id: int, question_text: str):

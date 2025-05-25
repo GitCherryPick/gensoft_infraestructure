@@ -1,6 +1,7 @@
 import subprocess
 import tempfile
 import os
+import re
 
 def run_code(code: str):
     with tempfile.NamedTemporaryFile("w+", suffix=".py", delete=False) as tmp:
@@ -26,10 +27,11 @@ def execute_code(code: str, call: str):
         )
     except subprocess.TimeoutExpired:
         os.remove(temp_script_path)
-        return {"output": "", "error": "TimeOut: Code execution timed out"}
+        return {"output": "", "error": "TimeOut: Code execution timed out", "line": ""}
     
     os.remove(temp_script_path)
     return {
         "output": result.stdout,
-        "error": result.stderr.strip().split("\n")[-1] if result.stderr else ""
+        "error": result.stderr.strip().split("\n")[-1] if result.stderr else "",
+        "line": re.findall("line \d", result.stderr)[-1][-1] if result.stderr else ""
     }
