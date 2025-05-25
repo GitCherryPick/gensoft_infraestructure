@@ -289,9 +289,9 @@ async def update_task(id: int, task: dict):
 async def delete_task(id: int):
     return await call_service("sandbox", "DELETE", f"/taskcode/{id}")
 
-@router.post("/sandbox/taskcode/{id}/template")
+@router.get("/sandbox/taskcode/{id}/template")
 async def get_template(id: int):
-    return await call_service("sandbox", "POST", f"/taskcode/{id}/template")
+    return await call_service("sandbox", "GET", f"/taskcode/{id}/template")
 
 @router.post("/sandbox/codereplicated")
 async def submit_code(submission: dict):

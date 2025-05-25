@@ -11,13 +11,18 @@ class ReplicatedFeedback(BaseModel):
     class Config:
         from_attributes = True 
 
+class ErrorFeedback(BaseModel):
+    error: str
+    line: int
+
+    class Config:
+        from_attributes = True
+
 class LabFeedback(BaseModel):
-    puntaje: int
     feedback: str
     estado: str
-    pistas: Optional[List[str]] = []
-    warnings: Optional[List[str]] = []
-    errores: Optional[List[str]] = []
+    warnings: Optional[List[str]]
+    errores: Optional[ErrorFeedback]
     
     class Config:
         from_attributes = True

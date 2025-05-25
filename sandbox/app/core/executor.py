@@ -17,7 +17,6 @@ def execute_code(code: str, call: str):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as temp_script:
         temp_script.write(full_code.encode("utf-8"))
         temp_script_path = temp_script.name
-
     try:
         result = subprocess.run(
             ["python", temp_script_path],
@@ -28,10 +27,10 @@ def execute_code(code: str, call: str):
     except subprocess.TimeoutExpired:
         os.remove(temp_script_path)
         return {"output": "", "error": "TimeOut: Code execution timed out", "line": ""}
-    
+    print(result)
     os.remove(temp_script_path)
     return {
         "output": result.stdout,
         "error": result.stderr.strip().split("\n")[-1] if result.stderr else "",
-        "line": re.findall("line \d", result.stderr)[-1][-1] if result.stderr else ""
+        "line": re.findall("line \d+", result.stderr)[-1].split(" ")[1] if result.stderr else ""
     }
