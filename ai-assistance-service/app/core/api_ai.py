@@ -49,6 +49,7 @@ def ask_ai_feedback_rep(question_text: str):
             "response_schema": ReplicatedFeedback
         }
     )
+    print(response.text)
     return response.text
     
 def ask_ai_feedback_lab(question_text: str):

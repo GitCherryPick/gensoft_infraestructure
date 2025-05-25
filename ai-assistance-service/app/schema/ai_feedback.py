@@ -19,8 +19,7 @@ class ErrorFeedback(BaseModel):
         from_attributes = True
 
 class LabFeedback(BaseModel):
-    feedback: str
-    estado: str
+    feedback_docente: str
     warnings: Optional[List[str]]
     errores: Optional[ErrorFeedback]
     
