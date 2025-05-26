@@ -8,7 +8,7 @@ from app.schema.code_input import CodeInput, CodeInput2
 from app.api.executor import execute_code
 from app.model.submissions import Submission
 from app.schema.submission import SubmissionCreate, SubmissionUpdate, SubmissionOut, SubmissionInput 
-
+from app.model.tests import Tests
 router = APIRouter()
 
 def get_db():
@@ -49,19 +49,22 @@ def getScore(
 ):
     submissions = (
         db.query(Submission)
-        .filter(Submission.user_id == user_id, Submission.task_id == task_id, Submission.tipo_problema == "tasks")
+        .filter(
+            Submission.user_id == user_id,
+            Submission.task_id == task_id,
+            Submission.tipo_problema == "tasks"
+        )
         .all()
     )
 
-    print("submissions")
-    print(submissions)
+    score = max((subi.score for subi in submissions), default=0)
 
-    score = 0
-    for subi in submissions:
-        if(subi.score > score):
-            score = subi.score
-    
-    return score
+    total_test_cases = db.query(Tests).filter(Tests.task_id == task_id).count()
+
+    return {
+        "score": score,
+        "total_cases": total_test_cases
+    }
 
 @router.get("/tasks/{task_id}")
 def get_task(task_id: int, db: Session = Depends(get_db)):
