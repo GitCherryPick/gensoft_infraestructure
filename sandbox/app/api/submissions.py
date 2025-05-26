@@ -10,12 +10,14 @@ router = APIRouter(prefix="/submissions", tags=["submissions"])
 
 @router.post("/", response_model=SubmissionOut, status_code=status.HTTP_201_CREATED)
 def create_submission(sub: SubmissionCreate, db: Session = Depends(get_db)):
+
     if sub.tipo_problema not in ("task", "code_task"):
         raise HTTPException(
             status_code=400, detail="tipo_problema debe ser 'task' o 'code_task'"
         )
 
     db_sub = Submission(**sub.dict())
+
     db.add(db_sub)
     db.commit()
     db.refresh(db_sub)
