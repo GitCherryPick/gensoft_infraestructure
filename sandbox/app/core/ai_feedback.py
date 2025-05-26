@@ -67,7 +67,7 @@ async def get_feedback_ai_lab(content: LabRequest):
     """
     prompt = f"""
     Eres un evaluador de código python, tu tarea es analizar el código proporcionado por el estudiante: {content.codigo_estudiante}. Dado el contexto del ejercicio: 
-    {content.enunciado} y los errores encontrados en el resultado(si es que existen): {content.resultado_obtenido}, para los campos resultantes considera:
+    {content.enunciado}, la llamada {content.llamada_funcion} y los errores encontrados en el resultado(si es que existen): {content.resultado_obtenido}, para los campos resultantes considera:
     *   "feedback_docente": Una lista de descripciones técnicas de los errores o warnings del código del estudiante, pensada para el docente. 
     *   "warnings": Por favor, si hay warnings en el código del estudiante, indícalos aquí en la forma solicitada.
     *   "pistas_generadas": Solo necesito encontrar dos tipos de errores, tambien menciona la linea principal de ambos:

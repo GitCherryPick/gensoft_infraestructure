@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class LabRequest(BaseModel):
     codigo_estudiante: str
     enunciado: str
+    llamada_funcion: str
     resultado_obtenido: str
 
 class ErrorFeedback(BaseModel):

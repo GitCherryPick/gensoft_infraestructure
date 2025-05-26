@@ -298,12 +298,12 @@ async def submit_code(submission: dict):
     return await call_service("sandbox", "POST", "/codereplicated", data=submission)
 
 @router.post("/sandbox/ai-feedback/replicator")
-async def ai_feedback_replicator(data: dict):
-    return await call_service("sandbox", "POST", "/ai-feedback/replicator", params=data)
+async def ai_feedback_replicator(input: dict):
+    return await call_service("sandbox", "POST", "/ai-feedback/replicator", data=input)
 
 @router.post("/sandbox/ai-feedback/lab")
-async def ai_feedback_lab(data: dict):
-    return await call_service("sandbox", "POST", "/ai-feedback/lab", params=data)
+async def ai_feedback_lab(input: dict):
+    return await call_service("sandbox", "POST", "/ai-feedback/lab", data=input)
 
 ## ai assistance service
 @router.post("/ai/ask")
@@ -320,8 +320,7 @@ async def get_saved(user_id: str):
 
 @router.post("/ai/chat")
 async def chat(input_data: dict):
-    return await call_service("ai",
-                               "POST", "/ai/chat", data=input_data)
+    return await call_service("ai", "POST", "/ai/chat", data=input_data)
 
 @router.post("/ai/ask-feedback/lab")
 async def ask_ai_feedback_labs(question: dict):
