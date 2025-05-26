@@ -78,9 +78,16 @@ def test_obtain_template():
     response_data = response.json()
     assert response_data["template_code"] == template    
 
+def test_compare_code_with_extra_whitespace():
+    example_submission = {
+        "task_replicator_id": task_data_id,
+        "student_code": "this_year = 2025\n\nif(this_year > 2000):\n    return 'welcome new era'\n\nelif(this_year > 3000):\n    return 'Es el futuro'\n\nelse:\n    return 'welcome past'\n"
+    }
+    response = client.post("/codereplicated", json=example_submission)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["result"] in ["Tarea completada con exito", "Incorrecto"]
+
 def test_delete_task():
     response = client.delete(f"/taskcode/{task_data_id}")
     assert response.status_code == 200
- 
-
-
