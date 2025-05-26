@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.api_ai import ask_ai as ask_ai_core
 from app.core.api_ai import conversate_ai as conversate_ai_core 
 from app.core.api_ai import ask_ai_feedback_rep
+from app.core.api_ai import ask_ai_feedback_lab
 from app.schema.ai_question import AIQuestion, AIResponse, AIConversateResponse
 from app.schema.chat_interaction import ChatInput, ChatOutput
 from app.schema.ai_feedback import ReplicatedFeedback, LabFeedback
@@ -25,6 +26,16 @@ def ask_ai_feedback_replicator(ai_question: AIQuestion):
     Asking a question for replicated code support.
     """
     response = ask_ai_feedback_rep(ai_question.question)
+    if not response:
+        raise HTTPException(status_code=418, detail="Bad connection with ai-assistance-ms")
+    return response
+
+@router.post("/ask-feedback/lab")
+def ask_ai_feedback_labs(ai_question: AIQuestion):
+    """
+    Asking a question for lab code support.
+    """
+    response = ask_ai_feedback_lab(ai_question.question)
     if not response:
         raise HTTPException(status_code=418, detail="Bad connection with ai-assistance-ms")
     return response

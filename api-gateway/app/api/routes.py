@@ -9,7 +9,8 @@ router = APIRouter()
 SERVICES = {
     "user": os.getenv("USER_MANAGEMENT_URL", "http://user-management-service:8000"),
     "content": os.getenv("CONTENT_MANAGEMENT_URL", "http://content-management-service:8001"),
-    "sandbox": os.getenv("SANDBOX_URL", "http://sandbox:8002")
+    "sandbox": os.getenv("SANDBOX_URL", "http://sandbox:8002"),
+    "ai": os.getenv("AI_ASSISTANCE_URL", "http://ai-assistance-service:8005")
 }
 
 async def call_service(
@@ -271,3 +272,66 @@ async def add_test_case(task_id: int, test_data: dict):
 @router.delete("/sandbox/tests/{test_id}")
 async def delete_test_case(test_id: int):
     return await call_service("sandbox", "DELETE", f"/tests/{test_id}")
+
+@router.post("/sandbox/taskcode")
+async def create_task(task: dict):
+    return await call_service("sandbox", "POST", "/taskcode", data=task)
+
+@router.get("/sandbox/taskcode")
+async def get_all_tasks(skip: int = 0, limit: int = 100):
+    return await call_service("sandbox", "GET", "/taskcode", params={"skip": skip, "limit": limit})
+
+@router.get("/sandbox/taskcode/{id}")
+async def read(id: int):
+    return await call_service("sandbox", "GET", f"/taskcode/{id}")
+
+@router.put("/sandbox/taskcode/{id}")
+async def update_task(id: int, task: dict):
+    return await call_service("sandbox", "PUT", f"/taskcode/{id}", data=task)
+
+@router.delete("/sandbox/taskcode/{id}")
+async def delete_task(id: int):
+    return await call_service("sandbox", "DELETE", f"/taskcode/{id}")
+
+@router.get("/sandbox/taskcode/{id}/template")
+async def get_template(id: int):
+    return await call_service("sandbox", "GET", f"/taskcode/{id}/template")
+
+@router.post("/sandbox/codereplicated")
+async def submit_code(submission: dict):
+    return await call_service("sandbox", "POST", "/codereplicated", data=submission)
+
+@router.post("/sandbox/ai-feedback/replicator")
+async def ai_feedback_replicator(input: dict):
+    return await call_service("sandbox", "POST", "/ai-feedback/replicator", data=input)
+
+@router.post("/sandbox/ai-feedback/lab")
+async def ai_feedback_lab(input: dict):
+    return await call_service("sandbox", "POST", "/ai-feedback/lab", data=input)
+
+## ai assistance service
+@router.post("/ai/ask")
+async def ask_ai(question: dict):
+    return await call_service("ai", "POST", "/ai/ask", data=question)
+
+@router.post("/ai/ask-feedback/replicator")
+async def ask_ai_feedback_replicator(question: dict):
+    return await call_service("ai", "POST", "/ai/ask-feedback/replicator", data=question)
+
+@router.get("/ai/saved/{user_id}")
+async def get_saved(user_id: str):
+    return await call_service("ai", "GET", f"/ai/saved/{user_id}")
+
+@router.post("/ai/chat")
+async def chat(input_data: dict):
+    return await call_service("ai", "POST", "/ai/chat", data=input_data)
+
+@router.post("/ai/ask-feedback/lab")
+async def ask_ai_feedback_labs(question: dict):
+    return await call_service("ai", "POST", "/ai/ask-feedback/lab", data=question)
+
+
+# Feedback Tasks Endpoints
+@router.post("/feedback/exercise")
+async def create_feedback_task(task: dict):
+    return await call_service("user", "POST", "/feedback/exercise", data=task)

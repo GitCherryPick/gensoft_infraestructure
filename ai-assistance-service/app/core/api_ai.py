@@ -52,6 +52,21 @@ def ask_ai_feedback_rep(question_text: str):
     print(response.text)
     return response.text
     
+def ask_ai_feedback_lab(question_text: str):
+    """
+    Asking a question to an AI model about analysing code
+    """
+    client = genai.Client(api_key=api_key_gensoft)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=question_text,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": LabFeedback
+        }
+    )
+    return response.text
+
 def conversate_ai(user_id: int, question_text: str):
     """
     Conversing with an AI model.

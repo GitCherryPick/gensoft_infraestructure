@@ -20,7 +20,7 @@ def get_db():
 
 @router.post("/tasks")
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
-    db_task = Tasks(title=task.title, enunciado=task.enunciado)
+    db_task = Tasks(title=task.title, enunciado=task.enunciado, pistas=task.pistas)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
@@ -60,6 +60,7 @@ def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get
 
     task.title = task_update.title
     task.enunciado = task_update.enunciado
+    task.pistas = task_update.pistas
     db.commit()
     return {"message": "Tarea actualizada correctamente"}
 
