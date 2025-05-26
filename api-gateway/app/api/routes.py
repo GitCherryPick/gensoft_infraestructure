@@ -8,7 +8,7 @@ router = APIRouter()
 # Service URLs with defaults
 SERVICES = {
     "user": os.getenv("USER_MANAGEMENT_URL", "http://user-management-service:8000"),
-    "content": os.getenv("CONTENT_MANAGEMENT_URL", "http://content-management-service:8001"),
+    "content": os.getenv("CONTENT_MANAGEMENT_URL", "http://content-management-service:8003"),
     "sandbox": os.getenv("SANDBOX_URL", "http://sandbox:8002"),
     "ai": os.getenv("AI_ASSISTANCE_URL", "http://ai-assistance-service:8005")
 }
@@ -120,16 +120,12 @@ async def get_content(content_id: int):
 async def create_content(content_data: dict):
     return await call_service("content", "POST", "/contents/", data=content_data)
 
-@router.get("/modules/{module_id}/contents")
-async def get_module_contents(module_id: int):
-    return await call_service("content", "GET", f"/modules/{module_id}/contents")
-
 @router.get("/contents")
 async def get_contents(skip: int = 0, limit: int = 100):
     return await call_service("content", "GET", "/contents", params={"skip": skip, "limit": limit})
 
 @router.get("/contents/module/{module_id}")
-async def get_module_contents(module_id: int):
+async def get_contents_by_module(module_id: int):
     return await call_service("content", "GET", f"/contents/module/{module_id}")
 
 @router.get("/contents/module/{module_id}/type/{content_type}")
@@ -194,7 +190,49 @@ async def upload_slide_content(
 
 @router.get("/contents/types")
 async def get_content_types():
-    return await call_service("content", "GET", "/contents/types")
+    return await call_service("content", "GET", "/content-types")
+
+# Exercise Endpoints (Content Management)
+@router.post("/exercises/")
+async def create_exercise(exercise_data: dict):
+    return await call_service("content", "POST", "/exercises/", data=exercise_data)
+
+@router.get("/exercises/")
+async def get_exercises():
+    return await call_service("content", "GET", "/exercises/")
+
+@router.get("/exercises/last")
+async def get_last_exercise():
+    return await call_service("content", "GET", "/exercises/last")
+
+@router.get("/exercises/{exercise_id}")
+async def get_exercise(exercise_id: int):
+    return await call_service("content", "GET", f"/exercises/{exercise_id}")
+
+# Course Endpoints (Content Management)
+@router.post("/courses/")
+async def create_course(course_data: dict):
+    return await call_service("content", "POST", "/courses/", data=course_data)
+
+@router.get("/courses/")
+async def get_courses(skip: int = 0, limit: int = 100):
+    return await call_service("content", "GET", "/courses/", params={"skip": skip, "limit": limit})
+
+@router.get("/courses/{course_id}")
+async def get_course(course_id: int):
+    return await call_service("content", "GET", f"/courses/{course_id}")
+
+@router.put("/courses/{course_id}")
+async def update_course(course_id: int, course_data: dict):
+    return await call_service("content", "PUT", f"/courses/{course_id}", data=course_data)
+
+@router.delete("/courses/{course_id}")
+async def delete_course(course_id: int):
+    return await call_service("content", "DELETE", f"/courses/{course_id}")
+
+@router.get("/courses/default/id")
+async def get_default_course_id():
+    return await call_service("content", "GET", "/courses/default/id")
 
 # Module Endpoints (Content Management)
 @router.post("/modules/")
