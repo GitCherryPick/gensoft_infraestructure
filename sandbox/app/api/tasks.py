@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.model.tasks import Tasks
 from app.model.tests import Tests
@@ -40,6 +40,29 @@ def get_tasks(db: Session = Depends(get_db)):
     tasks = db.query(Tasks).all()
     return tasks
 
+
+@router.get("/tasks/getScore")
+def getScore(
+    task_id: int = Query(..., title="ID de la tarea", example=1),
+    user_id: int = Query(..., title="ID del usuario", example=1),
+    db: Session = Depends(get_db)
+):
+    submissions = (
+        db.query(Submission)
+        .filter(Submission.user_id == user_id, Submission.task_id == task_id, Submission.tipo_problema == "tasks")
+        .all()
+    )
+
+    print("submissions")
+    print(submissions)
+
+    score = 0
+    for subi in submissions:
+        if(subi.score > score):
+            score = subi.score
+    
+    return score
+
 @router.get("/tasks/{task_id}")
 def get_task(task_id: int, db: Session = Depends(get_db)):
     task = db.query(Tasks).filter(Tasks.id == task_id).first()
@@ -51,6 +74,8 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
         "enunciado": task.enunciado,
         "tests": [{"id": t.id, "input": t.input, "output": t.output} for t in task.tests]
     }
+
+
 
 @router.put("/tasks/{task_id}")
 def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get_db)):
@@ -151,7 +176,6 @@ def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
 
     db.add(nueva_submission)
     db.commit()
-
 
     return {
         "generalVeredict": generalVeredict,
