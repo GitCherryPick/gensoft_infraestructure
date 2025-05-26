@@ -3,25 +3,40 @@ from typing import Optional
 from datetime import datetime
 
 class Submission(BaseModel):
-    UserId: Optional[int] = None
+    user_id: Optional[int] = None
     code: str
-    taskId: int
+    task_id: Optional[int] = None
+    code_task_id: Optional[int] = None
+    tipo_problema: str
+    score: Optional[int] = None
 
 class SubmissionBase(BaseModel):
     user_id: int
     code: str
     result: str
 
+class SubmissionInput(BaseModel):
+    UserId: int
+    code: str
+    taskId: int
+
 class SubmissionCreate(SubmissionBase):
-    pass
+    task_id: Optional[int] = None
+    code_task_id: Optional[int] = None
+    tipo_problema: str
 
 class SubmissionUpdate(BaseModel):
     code: Optional[str] = None
     result: Optional[str] = None
+    score: Optional[int] = None
 
 class SubmissionOut(SubmissionBase):
     submission_id: int
     submission_date: datetime
+    task_id: Optional[int] = None
+    code_task_id: Optional[int] = None
+    tipo_problema: str
+    score: Optional[int] = None
 
     class Config:
         from_attributes = True

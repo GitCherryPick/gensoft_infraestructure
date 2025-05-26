@@ -10,6 +10,11 @@ router = APIRouter(prefix="/submissions", tags=["submissions"])
 
 @router.post("/", response_model=SubmissionOut, status_code=status.HTTP_201_CREATED)
 def create_submission(sub: SubmissionCreate, db: Session = Depends(get_db)):
+    if sub.tipo_problema not in ("task", "code_task"):
+        raise HTTPException(
+            status_code=400, detail="tipo_problema debe ser 'task' o 'code_task'"
+        )
+
     db_sub = Submission(**sub.dict())
     db.add(db_sub)
     db.commit()
@@ -32,8 +37,17 @@ def update_submission(submission_id: int, sub_update: SubmissionUpdate, db: Sess
     db_sub = db.query(Submission).get(submission_id)
     if not db_sub:
         raise HTTPException(status_code=404, detail="Submission not found")
-    for field, value in sub_update.dict(exclude_unset=True).items():
+
+    update_data = sub_update.dict(exclude_unset=True)
+
+    if "tipo_problema" in update_data and update_data["tipo_problema"] not in ("task", "code_task"):
+        raise HTTPException(
+            status_code=400, detail="tipo_problema debe ser 'task' o 'code_task'"
+        )
+
+    for field, value in update_data.items():
         setattr(db_sub, field, value)
+
     db.commit()
     db.refresh(db_sub)
     return db_sub
