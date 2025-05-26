@@ -325,3 +325,9 @@ async def chat(input_data: dict):
 @router.post("/ai/ask-feedback/lab")
 async def ask_ai_feedback_labs(question: dict):
     return await call_service("ai", "POST", "/ai/ask-feedback/lab", data=question)
+
+
+# Feedback Tasks Endpoints
+@router.post("/feedback/exercise")
+async def create_feedback_task(task: dict):
+    return await call_service("user", "POST", "/feedback/exercise", data=task)

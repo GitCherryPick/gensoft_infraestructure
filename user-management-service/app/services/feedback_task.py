@@ -1,7 +1,6 @@
 from app.model.feedback_tasks import FeedbackTask
 from app.schema.feedback_tasks import FeedbackTaskRequest, FeedbackTaskResponse
-from requests import Session
-
+from sqlalchemy.orm import Session
 
 def create_feedback(db: Session, task: FeedbackTaskRequest):
     """

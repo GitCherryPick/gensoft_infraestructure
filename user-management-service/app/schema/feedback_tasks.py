@@ -1,11 +1,12 @@
+from typing import List
 from pydantic import BaseModel
 
 class FeedbackTask(BaseModel):
-    student_id: str
-    task_id_lab: int = None
-    task_id_rep: int = None
-    feedback_ai: dict = None
-    feedback_docente: dict = None
+    student_id: int
+    task_id_lab: int = 0
+    task_id_rep: int = 0
+    feedback_ai: List[str] = []
+    feedback_docente: List[str] = []
     n_intentos: int = 0
     estado: str = 'pendiente' 
 

@@ -4,7 +4,7 @@ from app.schema.feedback_tasks import FeedbackTaskRequest, FeedbackTaskResponse
 from app.database import get_db
 from app.services.feedback_task import create_feedback
 
-router = APIRouter(prefix="/feedback", tags=["users"])
+router = APIRouter()
 
 @router.post("/exercise", response_model=FeedbackTaskResponse)
 def create_feedback_task(task: FeedbackTaskRequest, db=Depends(get_db)):
