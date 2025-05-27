@@ -16,7 +16,7 @@ def create_submission(sub: SubmissionCreate, db: Session = Depends(get_db)):
             status_code=400, detail="tipo_problema debe ser 'task' o 'code_task'"
         )
 
-    db_sub = Submission(**sub.dict())
+    db_sub = Submission(**sub.model_dump())
 
     db.add(db_sub)
     db.commit()
