@@ -5,6 +5,7 @@ from app.api import executor
 from app.api import tasks
 from app.api import code_tasks
 from app.api import submissions
+from app.api import ai_feedback_router
 from app.database import engine
 from app.model.base import Base
 from app.seed import seed_task_replicators
@@ -34,3 +35,4 @@ app.include_router(executor.router, tags=["executor"])
 app.include_router(tasks.router, tags=["tasks"])
 app.include_router(code_tasks.router, tags=["code_replicator"])
 app.include_router(submissions.router, tags=["submissions"])
+app.include_router(ai_feedback_router.router, tags=["ai-feedback"])
