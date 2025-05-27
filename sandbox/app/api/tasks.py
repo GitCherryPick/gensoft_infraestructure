@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.model.tasks import Tasks
 from app.model.tests import Tests
@@ -6,9 +6,9 @@ from app.schema.task import TaskCreate, TaskUpdate, TestCreate, TestBase
 from app.database import SessionLocal
 from app.schema.code_input import CodeInput, CodeInput2
 from app.api.executor import execute_code
-
-from app.schema.submission import Submission
-
+from app.model.submissions import Submission
+from app.schema.submission import SubmissionCreate, SubmissionUpdate, SubmissionOut, SubmissionInput 
+from app.model.tests import Tests
 router = APIRouter()
 
 def get_db():
@@ -40,6 +40,32 @@ def get_tasks(db: Session = Depends(get_db)):
     tasks = db.query(Tasks).all()
     return tasks
 
+
+@router.get("/tasks/getScore")
+def getScore(
+    task_id: int = Query(..., title="ID de la tarea", example=1),
+    user_id: int = Query(..., title="ID del usuario", example=1),
+    db: Session = Depends(get_db)
+):
+    submissions = (
+        db.query(Submission)
+        .filter(
+            Submission.user_id == user_id,
+            Submission.task_id == task_id,
+            Submission.tipo_problema == "tasks"
+        )
+        .all()
+    )
+
+    score = max((subi.score for subi in submissions), default=0)
+
+    total_test_cases = db.query(Tests).filter(Tests.task_id == task_id).count()
+
+    return {
+        "score": score,
+        "total_cases": total_test_cases
+    }
+
 @router.get("/tasks/{task_id}")
 def get_task(task_id: int, db: Session = Depends(get_db)):
     task = db.query(Tasks).filter(Tasks.id == task_id).first()
@@ -51,6 +77,8 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
         "enunciado": task.enunciado,
         "tests": [{"id": t.id, "input": t.input, "output": t.output} for t in task.tests]
     }
+
+
 
 @router.put("/tasks/{task_id}")
 def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get_db)):
@@ -104,7 +132,7 @@ def delete_test(test_id: int, db: Session = Depends(get_db)):
 # logica de enviar
 
 @router.post("/enviar")
-def enviar(submission: Submission, db: Session = Depends(get_db)):
+def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
     code_input_2_object = CodeInput2(code=submission.code, call="suma(1,2)")
     veredicts = []
 
@@ -113,6 +141,7 @@ def enviar(submission: Submission, db: Session = Depends(get_db)):
 
     test_cases = task_i.tests
     generalVeredict = "Accepted"
+    countACs = 0
 
     for test_case in test_cases:
         result = execute_code(CodeInput2(code=submission.code, call=test_case.input))
@@ -121,6 +150,7 @@ def enviar(submission: Submission, db: Session = Depends(get_db)):
             veredict = "Error"
             error = result["error"]
         elif result["output"].rstrip('\n') == test_case.output.rstrip('\n'):
+            countACs += 1
             veredict = "Accepted"
             error = ""
         else:
@@ -137,8 +167,19 @@ def enviar(submission: Submission, db: Session = Depends(get_db)):
             "expectedOutput": test_case.output.rstrip('\n'),
             "output": result["output"].rstrip('\n')
         })
-        
+    
+    nueva_submission = Submission(
+        user_id=submission.UserId,
+        code=submission.code,
+        result=generalVeredict,
+        task_id=submission.taskId,
+        tipo_problema="tasks",
+        score=countACs
+    )
 
+
+    db.add(nueva_submission)
+    db.commit()
 
     return {
         "generalVeredict": generalVeredict,

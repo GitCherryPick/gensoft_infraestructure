@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import Query,APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 import httpx
 import os
 from typing import Optional
@@ -281,13 +281,27 @@ async def execute_python_function(execution_data: dict):
 async def create_coding_task(task_data: dict):
     return await call_service("sandbox", "POST", "/tasks", data=task_data)
 
-@router.get("/tasks")
-async def list_coding_tasks(skip: int = 0, limit: int = 10):
-    return await call_service("sandbox", "GET", "/tasks", params={"skip": skip, "limit": limit})
+@router.get("/tasks/getScore")
+async def get_score(
+    task_id: int = Query(..., description="ID de la tarea"),
+    user_id: int = Query(..., description="ID del usuario")
+):
+    return await call_service(
+        "sandbox",
+        "GET",
+        "/tasks/getScore",
+        params={"task_id": task_id, "user_id": user_id}
+    )
+
+
 
 @router.get("/tasks/{task_id}")
 async def get_coding_task(task_id: int):
     return await call_service("sandbox", "GET", f"/tasks/{task_id}")
+
+@router.get("/tasks")
+async def list_coding_tasks(skip: int = 0, limit: int = 10):
+    return await call_service("sandbox", "GET", "/tasks", params={"skip": skip, "limit": limit})
 
 @router.put("/tasks/{task_id}")
 async def update_coding_task(task_id: int, task_update: dict):
