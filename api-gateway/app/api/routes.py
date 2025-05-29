@@ -59,6 +59,10 @@ async def call_service(
 # User Management Endpoints
 # User Management Endpoints
 # User Management Endpoints
+
+@router.get("/users/")
+async def get_all_users(skip: int = 0, limit: int = 100):
+    return await call_service("user", "GET", "/users/", params={"skip": skip, "limit": limit})
 @router.get("/users/{user_id}")
 async def get_user(user_id: int):
     return await call_service("user", "GET", f"/users/{user_id}")
