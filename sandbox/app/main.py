@@ -27,7 +27,7 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
-    initialize_database()  # Asegura que la tabla replication_submissions exista
+    initialize_database()
     seed_task_replicators()
 
 @app.get("/")

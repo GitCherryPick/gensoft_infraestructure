@@ -6,7 +6,6 @@ from app.model.replication_submissions import ReplicationSubmission as DBReplica
 from app.schema.replication_submission import ReplicationSubmissionCreate, ReplicationSubmissionUpdate, ReplicationSubmissionOut
 
 def _serialize_list_fields(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Convierte los campos de lista a JSON"""
     list_fields = ['errores_sintacticos', 'diferencias_detectadas', 'pistas_generadas']
     for field in list_fields:
         if field in data and data[field] is not None and not isinstance(data[field], str):
@@ -16,20 +15,15 @@ def _serialize_list_fields(data: Dict[str, Any]) -> Dict[str, Any]:
 class ReplicationSubmissionRepository:
     @staticmethod
     def create(db: Session, submission: ReplicationSubmissionCreate) -> Dict[str, Any]:
-        # Convertir el modelo Pydantic a diccionario
         submission_data = submission.dict()
-        # Serializar campos de lista a JSON
         submission_data = _serialize_list_fields(submission_data)
         
-        # Crear el objeto de base de datos
         db_submission = DBReplicationSubmission(**submission_data)
         
-        # Guardar en la base de datos
         db.add(db_submission)
         db.commit()
         db.refresh(db_submission)
         
-        # Convertir a diccionario para la respuesta
         return ReplicationSubmissionRepository._to_dict(db_submission)
     
     @staticmethod
@@ -75,10 +69,8 @@ class ReplicationSubmissionRepository:
             return None
             
         update_data = submission.dict(exclude_unset=True)
-        # Serializar campos de lista a JSON
         update_data = ReplicationSubmissionRepository._serialize_list_fields(update_data)
         
-        # Actualizar campos
         for key, value in update_data.items():
             setattr(db_submission, key, value)
             
@@ -88,16 +80,13 @@ class ReplicationSubmissionRepository:
     
     @staticmethod
     def _to_dict(submission: DBReplicationSubmission) -> Dict[str, Any]:
-        """Convierte un objeto de base de datos a un diccionario"""
         result = {}
         for column in DBReplicationSubmission.__table__.columns:
             value = getattr(submission, column.name)
-            # Convertir fechas a string ISO format
             if hasattr(value, 'isoformat'):
                 value = value.isoformat()
             result[column.name] = value
         
-        # Deserializar campos JSON
         json_fields = ['errores_sintacticos', 'diferencias_detectadas', 'pistas_generadas']
         for field in json_fields:
             if field in result and isinstance(result[field], str):
