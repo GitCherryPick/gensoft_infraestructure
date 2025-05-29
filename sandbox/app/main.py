@@ -6,9 +6,11 @@ from app.api import tasks
 from app.api import code_tasks
 from app.api import submissions
 from app.api import ai_feedback_router
+from app.api import replication_submissions
 from app.database import engine
 from app.model.base import Base
 from app.seed import seed_task_replicators
+from app.initialize_db import initialize_database
 
 app = FastAPI()
 
@@ -25,6 +27,7 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
+    initialize_database()
     seed_task_replicators()
 
 @app.get("/")
@@ -36,3 +39,4 @@ app.include_router(tasks.router, tags=["tasks"])
 app.include_router(code_tasks.router, tags=["code_replicator"])
 app.include_router(submissions.router, tags=["submissions"])
 app.include_router(ai_feedback_router.router, tags=["ai-feedback"])
+app.include_router(replication_submissions.router, tags=["replication-submissions"])
