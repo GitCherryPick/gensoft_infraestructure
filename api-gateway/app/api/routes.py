@@ -201,6 +201,18 @@ async def create_exercise(exercise_data: dict):
 async def get_exercises():
     return await call_service("content", "GET", "/exercises/")
 
+@router.put("/exercises/{exercise_id}")
+async def update_exercise(exercise_id: int, exercise_data: dict):
+    return await call_service("content", "PUT", f"/exercises/{exercise_id}", data=exercise_data)
+
+@router.delete("/exercises/{exercise_id}")
+async def delete_exercise(exercise_id: int):
+    return await call_service("content", "DELETE", f"/exercises/{exercise_id}")
+
+@router.get("/exercises/instructor/{instructor_id}")
+async def get_exercises_by_instructor(instructor_id: int):
+    return await call_service("content", "GET", f"/exercises/instructor/{instructor_id}")
+
 @router.get("/exercises/last")
 async def get_last_exercise():
     return await call_service("content", "GET", "/exercises/last")
@@ -361,7 +373,37 @@ async def ai_feedback_replicator(input: dict):
 async def ai_feedback_lab(input: dict):
     return await call_service("sandbox", "POST", "/ai-feedback/lab", data=input)
 
-## ai assistance service
+## Replication Submissions Endpoints
+@router.post("/replication-submissions/")
+async def create_replication_submission(submission_data: dict):
+    return await call_service("sandbox", "POST", "/replication-submissions/", data=submission_data)
+
+@router.get("/replication-submissions/")
+async def get_all_replication_submissions(skip: int = 0, limit: int = 100):
+    return await call_service("sandbox", "GET", "/replication-submissions/", params={"skip": skip, "limit": limit})
+
+@router.get("/replication-submissions/{submission_id}")
+async def get_replication_submission(submission_id: int):
+    return await call_service("sandbox", "GET", f"/replication-submissions/{submission_id}")
+
+@router.get("/replication-submissions/user/{user_id}")
+async def get_replication_submissions_by_user(user_id: int, skip: int = 0, limit: int = 100):
+    return await call_service("sandbox", "GET", f"/replication-submissions/user/{user_id}", 
+                             params={"skip": skip, "limit": limit})
+
+@router.get("/replication-submissions/user/{user_id}/exercise/{exercise_id}")
+async def get_replication_submissions_by_user_and_exercise(user_id: int, exercise_id: int):
+    return await call_service("sandbox", "GET", f"/replication-submissions/user/{user_id}/exercise/{exercise_id}")
+
+@router.put("/replication-submissions/{submission_id}")
+async def update_replication_submission(submission_id: int, submission_data: dict):
+    return await call_service("sandbox", "PUT", f"/replication-submissions/{submission_id}", data=submission_data)
+
+@router.delete("/replication-submissions/{submission_id}")
+async def delete_replication_submission(submission_id: int):
+    return await call_service("sandbox", "DELETE", f"/replication-submissions/{submission_id}")
+
+# ai assistance service
 @router.post("/ai/ask")
 async def ask_ai(question: dict):
     return await call_service("ai", "POST", "/ai/ask", data=question)

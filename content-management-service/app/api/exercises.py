@@ -57,3 +57,37 @@ def get_exercise(exercise_id: int, db: Session = Depends(get_db)):
     if not db_exercise:
         raise HTTPException(status_code=404, detail="Exercise not found")
     return to_exercise_out(db_exercise)
+
+@router.put("/{exercise_id}", response_model=ExerciseOut)
+def update_exercise(exercise_id: int, exercise: ExerciseCreate, db: Session = Depends(get_db)):
+    db_exercise = db.query(Exercise).filter(Exercise.exercise_id == exercise_id).first()
+    if not db_exercise:
+        raise HTTPException(status_code=404, detail="Exercise not found")
+    
+    # Actualizar campos
+    exercise_data = exercise.model_dump()
+    exercise_data["visible_lines"] = json.dumps(exercise_data["visible_lines"])
+    
+    for key, value in exercise_data.items():
+        setattr(db_exercise, key, value)
+    
+    db.commit()
+    db.refresh(db_exercise)
+    return to_exercise_out(db_exercise)
+
+@router.delete("/{exercise_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_exercise(exercise_id: int, db: Session = Depends(get_db)):
+    db_exercise = db.query(Exercise).filter(Exercise.exercise_id == exercise_id).first()
+    if not db_exercise:
+        raise HTTPException(status_code=404, detail="Exercise not found")
+    
+    db.delete(db_exercise)
+    db.commit()
+    return {"message": "Exercise deleted successfully"}
+
+@router.get("/instructor/{instructor_id}", response_model=list[ExerciseOut])
+def get_exercises_by_instructor(instructor_id: int, db: Session = Depends(get_db)):
+    db_exercises = db.query(Exercise).filter(Exercise.instructor_id == instructor_id).all()
+    if not db_exercises:
+        return []
+    return [to_exercise_out(db_ex) for db_ex in db_exercises]
