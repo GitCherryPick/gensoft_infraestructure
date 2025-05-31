@@ -23,12 +23,16 @@ class TaskBase(BaseModel):
 class TaskCreate(TaskBase):
     tests: Optional[List[TestCreate]] = []
     pistas: Optional[List[str]] = []
+    date_limit: Optional[datetime] = None
+    grade: Optional[int] = None
 
-class Task(TaskBase):
+class TaskOut(TaskBase):
     id: int
     created_at: datetime
     tests: List[Test] = []
     pistas: Optional[List[str]] = []
+    date_limit: Optional[datetime] = None
+    grade: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -37,3 +41,5 @@ class TaskUpdate(BaseModel):
     title: str
     enunciado: str
     pistas: Optional[List[str]] = []
+    date_limit: Optional[datetime] = None
+    grade: Optional[int] = None

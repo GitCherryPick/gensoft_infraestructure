@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from app.model.tasks import Tasks
 from app.model.tests import Tests
-from app.schema.task import TaskCreate, TaskUpdate, TestCreate, TestBase
+from app.schema.task import TaskCreate, TaskUpdate, TestCreate, TaskOut
 from app.database import SessionLocal
-from app.schema.code_input import CodeInput, CodeInput2
+from app.schema.code_input import CodeInput2
 from app.api.executor import execute_code
 from app.model.submissions import Submission
-from app.schema.submission import SubmissionCreate, SubmissionUpdate, SubmissionOut, SubmissionInput 
+from app.schema.submission import SubmissionInput 
 from app.model.tests import Tests
+
 router = APIRouter()
 
 def get_db():
@@ -18,16 +19,13 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/tasks")
+@router.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
-    db_task = Tasks(title=task.title, enunciado=task.enunciado, pistas=task.pistas)
+    db_task = Tasks(**task.model_dump())
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
-
-    print("llego aqui")
-    print(task.tests)
-
+    
     for test in task.tests:
         db_test = Tests(task_id=db_task.id, input=test.input, output=test.output)
         db.add(db_test)
@@ -66,19 +64,12 @@ def getScore(
         "total_cases": total_test_cases
     }
 
-@router.get("/tasks/{task_id}")
+@router.get("/tasks/{task_id}", response_model=TaskOut)
 def get_task(task_id: int, db: Session = Depends(get_db)):
-    task = db.query(Tasks).filter(Tasks.id == task_id).first()
-    if not task:
+    task_db = db.query(Tasks).filter(Tasks.id == task_id).first()
+    if not task_db:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
-    return {
-        "id": task.id,
-        "title": task.title,
-        "enunciado": task.enunciado,
-        "tests": [{"id": t.id, "input": t.input, "output": t.output} for t in task.tests]
-    }
-
-
+    return task_db
 
 @router.put("/tasks/{task_id}")
 def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get_db)):
