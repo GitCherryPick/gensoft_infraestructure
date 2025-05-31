@@ -5,6 +5,7 @@ from app.model import User, StudentTransfer
 from app.schema.users import UserCreate, UserResponse
 from app.schema.student_transfers import StudentTransferCreate, StudentTransferResponse
 from app.database import get_db
+from app.utils.security import get_password_hash
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -22,17 +23,37 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    if db.query(User).filter(User.username == user.username).first():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El nombre de usuario ya está en uso"
+        )
+    
+    if db.query(User).filter(User.email == user.email).first():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El correo electrónico ya está en uso"
+        )
+    
     db_user = User(
         username=user.username,
         email=user.email,
-        password_hash=user.password,  # Use bcrypt in production
+        password_hash=get_password_hash(user.password),
         full_name=user.full_name or "",
         status="active",
     )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    
+    try:
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al crear el usuario: {str(e)}"
+        )
 
 @router.delete("/{user_username}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_username: str, db: Session = Depends(get_db)):
