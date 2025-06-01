@@ -1,6 +1,6 @@
 # models/task.py
 
-from sqlalchemy import Column, Integer, String, Text, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Text, TIMESTAMP, DateTime
 from .base import Base
 from datetime import datetime
 
@@ -13,4 +13,6 @@ class CodeTask(Base):
     expected_code = Column(Text, nullable=True)
     expected_result = Column(Text, nullable=True) 
     template_code = Column(Text, nullable=True)
+    date_limit = Column(DateTime, nullable = True)
+    grade = Column(Integer, nullable = True)
     created_at = Column(TIMESTAMP, default=datetime.now)
