@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, Text, String, DateTime, ForeignKey, Float
 from sqlalchemy.sql import func
 from app.model.base import Base
 
@@ -13,4 +13,5 @@ class Submission(Base):
     task_id = Column(Integer, ForeignKey("tasks.id"), nullable=True) 
     code_task_id = Column(Integer, ForeignKey("code_tasks.id"), nullable=True)
     tipo_problema = Column(String(50), nullable=False) # 'task' o 'code_task'
-    score = Column(Integer, nullable=True)  # ✅ Nuevo campo de puntaje
+    score = Column(Float, nullable=True)  # ✅ Nuevo campo de puntaje
+    number_hints_used = Column(Integer, nullable = False, default = 0)
