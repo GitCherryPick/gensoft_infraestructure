@@ -13,6 +13,8 @@ def create_code_task(db: Session, task: TaskRequest):
         expected_code=task.expected_code,
         expected_result=task.expected_result,
         template_code=task.template_code,
+        date_limit=task.date_limit,
+        grade=task.grade
     )
     db.add(new_task)
     db.commit()
@@ -24,7 +26,7 @@ def update_code_task(db: Session, id: int, task: TaskRequest):
     db_rep_task = get_code_task(db, id)
     if not db_rep_task:
         return None
-    for field, value in task.dict(exclude_unset=True).items():
+    for field, value in task.model_dump(exclude_unset=True).items():
         setattr(db_rep_task, field, value)
     db.commit()
     db.refresh(db_rep_task)

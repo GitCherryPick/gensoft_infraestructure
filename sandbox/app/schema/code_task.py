@@ -8,6 +8,8 @@ class TaskBase(BaseModel):
     expected_code: Optional[str] = None
     expected_result: Optional[str] = None
     template_code: Optional[str] = None
+    date_limit: Optional[datetime] = None
+    grade: Optional[int] = None
 
 class TaskRequest(TaskBase):
     pass
