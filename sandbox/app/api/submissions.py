@@ -62,3 +62,20 @@ def delete_submission(submission_id: int, db: Session = Depends(get_db)):
     db.delete(db_sub)
     db.commit()
     return None
+
+@router.get("/task/{task_id}", response_model=List[SubmissionOut])
+def get_submission_by_task_id(task_id: int, db: Session = Depends(get_db)):
+    db_sub = db.query(Submission).filter(Submission.task_id == task_id).all()
+    if not db_sub:
+        raise HTTPException(status_code=404, detail="Submissions not found")
+    return db_sub
+
+@router.get("/task/{task_id}/{user_id}", response_model=List[SubmissionOut])
+def get_submission_by_task_id(task_id: int, user_id: int, db: Session = Depends(get_db)):
+    db_sub = db.query(Submission).filter(
+        (Submission.task_id == task_id) & (Submission.user_id == user_id)
+    ).order_by(Submission.submission_date.desc()).all()
+    if not db_sub:
+        raise HTTPException(status_code=404, detail="Submissions not found")
+    return db_sub
+
