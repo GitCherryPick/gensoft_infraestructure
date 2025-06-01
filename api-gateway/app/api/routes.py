@@ -59,6 +59,10 @@ async def call_service(
 # User Management Endpoints
 # User Management Endpoints
 # User Management Endpoints
+
+@router.get("/users/")
+async def get_all_users(skip: int = 0, limit: int = 100):
+    return await call_service("user", "GET", "/users/", params={"skip": skip, "limit": limit})
 @router.get("/users/{user_id}")
 async def get_user(user_id: int):
     return await call_service("user", "GET", f"/users/{user_id}")
@@ -98,7 +102,7 @@ async def create_institution(institution_data: dict):
 
 @router.get("/institutions")
 async def list_institutions(skip: int = 0, limit: int = 10):
-    return await call_service("user", "GET", "/institutions", params={"skip": skip, "limit": limit})
+    return await call_service("user", "GET", "/institutions/", params={"skip": skip, "limit": limit})
 
 @router.put("/institutions/{institution_id}")
 async def update_institution(institution_id: int, institution_data: dict):
@@ -200,6 +204,18 @@ async def create_exercise(exercise_data: dict):
 @router.get("/exercises/")
 async def get_exercises():
     return await call_service("content", "GET", "/exercises/")
+
+@router.put("/exercises/{exercise_id}")
+async def update_exercise(exercise_id: int, exercise_data: dict):
+    return await call_service("content", "PUT", f"/exercises/{exercise_id}", data=exercise_data)
+
+@router.delete("/exercises/{exercise_id}")
+async def delete_exercise(exercise_id: int):
+    return await call_service("content", "DELETE", f"/exercises/{exercise_id}")
+
+@router.get("/exercises/instructor/{instructor_id}")
+async def get_exercises_by_instructor(instructor_id: int):
+    return await call_service("content", "GET", f"/exercises/instructor/{instructor_id}")
 
 @router.get("/exercises/last")
 async def get_last_exercise():
@@ -331,7 +347,7 @@ async def create_task(task: dict):
 
 @router.get("/sandbox/taskcode")
 async def get_all_tasks(skip: int = 0, limit: int = 100):
-    return await call_service("sandbox", "GET", "/taskcode", params={"skip": skip, "limit": limit})
+    return await call_service("sandbox", "GET", "/taskcode/", params={"skip": skip, "limit": limit})
 
 @router.get("/sandbox/taskcode/{id}")
 async def read(id: int):
@@ -389,7 +405,37 @@ async def get_submissions_by_task_id(task_id: int):
 async def get_submissions_by_task_and_user(task_id: int, user_id: int):
     return await call_service("sandbox", "GET", f"/submissions/task/{task_id}/{user_id}")
 
-## ai assistance service
+## Replication Submissions Endpoints
+@router.post("/replication-submissions/")
+async def create_replication_submission(submission_data: dict):
+    return await call_service("sandbox", "POST", "/replication-submissions/", data=submission_data)
+
+@router.get("/replication-submissions/")
+async def get_all_replication_submissions(skip: int = 0, limit: int = 100):
+    return await call_service("sandbox", "GET", "/replication-submissions/", params={"skip": skip, "limit": limit})
+
+@router.get("/replication-submissions/{submission_id}")
+async def get_replication_submission(submission_id: int):
+    return await call_service("sandbox", "GET", f"/replication-submissions/{submission_id}")
+
+@router.get("/replication-submissions/user/{user_id}")
+async def get_replication_submissions_by_user(user_id: int, skip: int = 0, limit: int = 100):
+    return await call_service("sandbox", "GET", f"/replication-submissions/user/{user_id}", 
+                             params={"skip": skip, "limit": limit})
+
+@router.get("/replication-submissions/user/{user_id}/exercise/{exercise_id}")
+async def get_replication_submissions_by_user_and_exercise(user_id: int, exercise_id: int):
+    return await call_service("sandbox", "GET", f"/replication-submissions/user/{user_id}/exercise/{exercise_id}")
+
+@router.put("/replication-submissions/{submission_id}")
+async def update_replication_submission(submission_id: int, submission_data: dict):
+    return await call_service("sandbox", "PUT", f"/replication-submissions/{submission_id}", data=submission_data)
+
+@router.delete("/replication-submissions/{submission_id}")
+async def delete_replication_submission(submission_id: int):
+    return await call_service("sandbox", "DELETE", f"/replication-submissions/{submission_id}")
+
+# ai assistance service
 @router.post("/ai/ask")
 async def ask_ai(question: dict):
     return await call_service("ai", "POST", "/ai/ask", data=question)
