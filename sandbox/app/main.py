@@ -9,7 +9,7 @@ from app.api import ai_feedback_router
 from app.api import replication_submissions
 from app.database import engine
 from app.model.base import Base
-from app.seed import seed_task_replicators
+from app.seed import seed_task_replicators, seed_task_lab
 from app.initialize_db import initialize_database
 
 app = FastAPI()
@@ -29,6 +29,7 @@ def on_startup():
     Base.metadata.create_all(bind=engine)
     initialize_database()
     seed_task_replicators()
+    seed_task_lab()
 
 @app.get("/")
 def root():
