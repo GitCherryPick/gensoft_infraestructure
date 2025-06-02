@@ -9,6 +9,7 @@ from app.api.executor import execute_code
 from app.model.submissions import Submission
 from app.schema.submission import SubmissionInput 
 from app.model.tests import Tests
+from sandbox.app.services.submissions_user import generate_missing_submissions
 
 router = APIRouter()
 
@@ -176,3 +177,18 @@ def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
         "generalVeredict": generalVeredict,
         "testCases": veredicts
     }
+
+@router.put("/task/{task_id}/close")
+async def close_task(task_id:int, db: Session = Depends(get_db)):
+    task = db.query(Tasks).filter(Tasks.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    if task.status == "Cerrada":
+        return {"message": "La tarea ya está cerrada"}
+    
+    task.status = "Cerrada"
+    db.commit()
+
+    await generate_missing_submissions(task_id, db)
+
+    return {"message": "Tarea cerrada y envíos generados para estudiantes sin envíos previos"}

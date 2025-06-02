@@ -405,6 +405,14 @@ async def get_submissions_by_task_id(task_id: int):
 async def get_submissions_by_task_and_user(task_id: int, user_id: int):
     return await call_service("sandbox", "GET", f"/submissions/task/{task_id}/{user_id}")
 
+@router.put("/sandbox/task/{task_id}/close")
+async def close_task(task_id: int):
+    return await call_service("sandbox", "PUT", f"/task/{task_id}/close")
+
+@router.get("/sandbox/submissions/task/{task_id}/generate-missing-submissions")
+async def generate_missing_submissions(task_id: int):
+    return await call_service("sandbox", "GET", f"/submissions/task/{task_id}/generate-missing-submissions")
+
 ## Replication Submissions Endpoints
 @router.post("/replication-submissions/")
 async def create_replication_submission(submission_data: dict):

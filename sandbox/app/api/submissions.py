@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from app.services.submissions_user import get_usernames_batch
+from app.services.submissions_user import get_usernames_batch, generate_missing_submissions
 
 from ..database import get_db
 from app.model.submissions import Submission
@@ -91,3 +91,8 @@ async def get_submission_by_task_id(task_id: int, user_id: int, db: Session = De
     for sub in db_subs:
         sub.username = user_data_map.get(sub.user_id, "No identificado")
     return db_subs
+
+@router.post("/task/{task_id}/generate-missing-submissions")
+async def generate_missing(task_id: int, db: Session = Depends(get_db)):
+    return await generate_missing_submissions(task_id,db)
+
