@@ -50,5 +50,8 @@ class SubmissionOut(SubmissionBase):
     score: Optional[int] = None
     test_feedback: Optional[List[TestVeredict]] = []
 
+class SubmissionResponse(SubmissionOut):
+    username: str
+
     class Config:
         from_attributes = True
