@@ -1,30 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from app.model.tasks import Tasks
-from app.model.tests import Tests
-from app.schema.task import TaskCreate, TaskUpdate, TestCreate, TaskOut
-from app.database import SessionLocal
-from app.schema.code_input import CodeInput2
-from app.api.executor import execute_code
-from app.model.submissions import Submission
-from app.schema.submission import SubmissionInput 
-from app.model.tests import Tests
-from app.model.hints import Hints
-from app.schema.hint import HintBase, HintCreate, HintUpdate, HintOut
 from typing import Optional, List
-from app.model.UsedHint import UsedHint
+
+from app.api.executor import execute_code
+
 from sqlalchemy import func
 
+from app.schema.task import TaskCreate, TaskUpdate, TestCreate, TaskOut
+
+from app.schema.code_input import CodeInput2
+from app.schema.submission import SubmissionInput 
+from app.schema.hint import HintBase, HintCreate, HintUpdate, HintOut
+
+from app.model.tasks import Tasks
+from app.model.tests import Tests
+from app.model.submissions import Submission
+from app.model.tests import Tests
+from app.model.hints import Hints
+from app.model.UsedHint import UsedHint
+
+from app.database import get_db
 
 router = APIRouter()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 # --- Endpoints para Hints ---
 @router.post("/hints/", response_model=HintOut, status_code=status.HTTP_201_CREATED)
@@ -175,9 +172,9 @@ def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get
     if not task:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
 
-    task.title = task_update.title
-    task.enunciado = task_update.enunciado
-    task.pistas = task_update.pistas
+    update_data = task_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(task, field, value)
     db.commit()
     return {"message": "Tarea actualizada correctamente"}
 
