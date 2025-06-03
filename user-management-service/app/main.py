@@ -26,6 +26,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-User-Data"], 
 )
 
 Base.metadata.create_all(bind=engine)

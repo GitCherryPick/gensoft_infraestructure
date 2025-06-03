@@ -72,23 +72,36 @@ async def login(
     token_data = {
         "sub": user.username,
         "user_id": user.id,
-        "email": user.email
+        "email": user.email,
+        "status": user.status,
+        "full_name": user.full_name or "",
+        "bio": "Me gusta aprender y compartir conocimiento. en la tecnologia de la informacion y la comunicacion.",
+
     }
     access_token = create_access_token(
         data=token_data,
-        expires_delta=timedelta(minutes=2003)
+        expires_delta=timedelta(minutes=2003),
+        
     )
     
     response = {
         "access_token": access_token, 
-        "token_type": "bearer"
+        "token_type": "bearer",
+        "user_id": str(user.id),
+        "username": user.username,
+        "email": user.email,
+        "status": user.status,
+        "full_name": user.full_name or "",
+        "bio": "Me gusta aprender y compartir conocimiento. en la tecnologia de la informacion y la comunicacion.",
     }
     
     user_data = {
         "user_id": str(user.id),
         "username": user.username,
         "email": user.email,
-        "full_name": user.full_name or ""
+        "status": user.status,
+        "full_name": user.full_name or "",
+        "bio": "Me gusta aprender y compartir conocimiento. en la tecnologia de la informacion y la comunicacion.",
     }
     
     response_headers = {
