@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from app.services.submissions_user import get_usernames_batch, generate_missing_submissions
 
 from ..database import get_db
 from app.model.submissions import Submission
-from app.schema.submission import SubmissionCreate, SubmissionUpdate, SubmissionOut
+from app.schema.submission import SubmissionCreate, SubmissionUpdate, SubmissionOut, SubmissionResponse
 
 router = APIRouter(prefix="/submissions", tags=["submissions"])
 
@@ -62,3 +63,36 @@ def delete_submission(submission_id: int, db: Session = Depends(get_db)):
     db.delete(db_sub)
     db.commit()
     return None
+
+@router.get("/task/{task_id}", response_model=List[SubmissionResponse])
+async def get_submission_by_task_id(task_id: int, db: Session = Depends(get_db)):
+    db_subs = db.query(Submission).filter(Submission.task_id == task_id).all()
+
+    if not db_subs:
+        raise HTTPException(status_code=404, detail="Submissions not found")
+    
+    user_ids = list(set(sub.user_id for sub in db_subs))
+    user_data_map = await get_usernames_batch(user_ids=user_ids)
+
+    for sub in db_subs:
+        sub.username = user_data_map.get(sub.user_id, "No identificado")
+    return db_subs
+
+@router.get("/task/{task_id}/{user_id}", response_model=List[SubmissionResponse])
+async def get_submission_by_task_id(task_id: int, user_id: int, db: Session = Depends(get_db)):
+    db_subs = db.query(Submission).filter(
+        (Submission.task_id == task_id) & (Submission.user_id == user_id)
+    ).order_by(Submission.submission_date.desc()).all()
+    if not db_subs:
+        raise HTTPException(status_code=404, detail="Submissions not found")
+    
+    user_ids = list(set(sub.user_id for sub in db_subs))
+    user_data_map = await get_usernames_batch(user_ids=user_ids)
+    for sub in db_subs:
+        sub.username = user_data_map.get(sub.user_id, "No identificado")
+    return db_subs
+
+@router.post("/task/{task_id}/generate-missing-submissions")
+async def generate_missing(task_id: int, db: Session = Depends(get_db)):
+    return await generate_missing_submissions(task_id,db)
+

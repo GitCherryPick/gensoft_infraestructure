@@ -30,3 +30,9 @@ def delete_feedback(db: Session, task_id: int):
     db.delete(feedback_task)
     db.commit()
     return feedback_task
+
+def get_feedback_by_id(db: Session, feedback_id: int):
+    """
+    Get a feedback task by its ID.
+    """
+    return db.query(FeedbackTask).filter(FeedbackTask.id == feedback_id).first()

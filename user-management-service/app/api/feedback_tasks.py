@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.model.feedback_tasks import FeedbackTask
 from app.schema.feedback_tasks import FeedbackTaskRequest, FeedbackTaskResponse
 from app.database import get_db
-from app.services.feedback_task import create_feedback, delete_feedback
+from app.services.feedback_task import create_feedback, delete_feedback, get_feedback_by_id
 
 router = APIRouter()
 
@@ -19,3 +19,10 @@ def delete_feedback_task(task_id: int, db=Depends(get_db)):
     if not response:
         raise HTTPException(status_code=404, detail="Feedback task not found")
     return response
+
+@router.get("/exercise/{feedback_id}", response_model=FeedbackTaskResponse)
+def get_feedback_task(feedback_id: int, db=Depends(get_db)):
+    feedback_task = get_feedback_by_id(db, feedback_id)
+    if not feedback_task:
+        raise HTTPException(status_code=404, detail="Feedback task not found")
+    return feedback_task
