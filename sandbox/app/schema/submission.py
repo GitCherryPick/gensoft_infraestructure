@@ -24,9 +24,11 @@ class SubmissionBase(BaseModel):
     status: Optional[str] = "Sin revisar"
 
 class SubmissionInput(BaseModel):
-    UserId: int
+    userId: int
     code: str
     taskId: int
+    result: Optional[str] = ""
+    autofeedback_id: Optional[int] = 0
 
 class SubmissionCreate(SubmissionBase):
     task_id: Optional[int] = None

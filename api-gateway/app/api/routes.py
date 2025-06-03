@@ -494,3 +494,7 @@ async def ask_ai_feedback_labs(question: dict):
 @router.post("/feedback/exercise")
 async def create_feedback_task(task: dict):
     return await call_service("user", "POST", "/feedback/exercise", data=task)
+
+@router.get("/feedback/exercise/{task_id}")
+async def get_feedback_task(task_id: int):
+    return await call_service("user", "GET", f"/feedback/exercise/{task_id}")

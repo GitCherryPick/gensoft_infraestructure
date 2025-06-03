@@ -34,7 +34,7 @@ class TaskOut(TaskBase):
     pistas: Optional[List[str]] = []
     date_limit: Optional[datetime] = None
     grade: Optional[int] = None
-    status: str
+    status: Optional[str] = "Abierta"
 
     class Config:
         from_attributes = True

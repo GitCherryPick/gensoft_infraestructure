@@ -10,7 +10,7 @@ from app.api.executor import execute_code
 from app.model.submissions import Submission
 from app.schema.submission import SubmissionInput 
 from app.model.tests import Tests
-from sandbox.app.services.submissions_user import generate_missing_submissions
+from app.services.submissions_user import generate_missing_submissions
 
 from app.model.hints import Hints
 from app.schema.hint import HintBase, HintCreate, HintUpdate, HintOut
@@ -262,21 +262,24 @@ def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
     penalidad_total = db.query(func.sum(Hints.penalty_points)).join(
         UsedHint, UsedHint.hint_id == Hints.hint_id
     ).filter(
-        UsedHint.user_id == submission.UserId,
+        UsedHint.user_id == submission.userId,
         UsedHint.task_id == submission.taskId
     ).scalar() or 0.0
 
     # Aquí puedes usar `menos` como penalización total
     menos = float(penalidad_total)
     nuevos_puntos = countACs - menos
+    puntos_totales = (nuevos_puntos*task_i.grade)/ len(test_cases)
 
     nueva_submission = Submission(
-        user_id=submission.UserId,
+        user_id=submission.userId,
         code=submission.code,
-        result=generalVeredict,
+        result=generalVeredict + submission.result,
         task_id=submission.taskId,
         tipo_problema="tasks",
-        score=nuevos_puntos
+        score=puntos_totales,
+        test_feedback=veredicts,
+        autofeedback_id=submission.autofeedback_id,
     )
 
 
