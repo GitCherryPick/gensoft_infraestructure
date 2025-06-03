@@ -9,6 +9,12 @@ from app.api.executor import execute_code
 from app.model.submissions import Submission
 from app.schema.submission import SubmissionInput 
 from app.model.tests import Tests
+from app.model.hints import Hints
+from app.schema.hint import HintBase, HintCreate, HintUpdate, HintOut
+from typing import Optional, List
+from app.model.UsedHint import UsedHint
+from sqlalchemy import func
+
 
 router = APIRouter()
 
@@ -19,6 +25,98 @@ def get_db():
     finally:
         db.close()
 
+
+# --- Endpoints para Hints ---
+@router.post("/hints/", response_model=HintOut, status_code=status.HTTP_201_CREATED)
+def create_new_hint(hint: HintCreate, db: Session = Depends(get_db)):
+    if hint.task_id:
+        task_exists = db.query(Tasks).filter(Tasks.id == hint.task_id).first()
+        if not task_exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Task with ID {hint.task_id} not found. Cannot create hint for a non-existent task."
+            )
+            
+    db_hint = Hints( 
+        task_id=hint.task_id,
+        hint_order=hint.hint_order,
+        hint_text=hint.hint_text,
+        penalty_points=hint.penalty_points
+    )
+    db.add(db_hint)
+    db.commit()
+    db.refresh(db_hint)
+    return db_hint
+
+@router.put("/hints/{hint_id}", response_model=HintOut)
+def update_existing_hint(hint_id: int, hint_update: HintUpdate, db: Session = Depends(get_db)):
+    db_hint = db.query(Hints).filter(Hints.hint_id == hint_id).first() # Using Hints directly
+    if db_hint is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Hint not found")
+
+    if hint_update.task_id is not None and hint_update.task_id != db_hint.task_id:
+        task_exists = db.query(Tasks).filter(Tasks.id == hint_update.task_id).first()
+        if not task_exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Cannot update hint: New task_id {hint_update.task_id} not found."
+            )
+
+    update_data = hint_update.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_hint, key, value)
+    
+    db.add(db_hint)
+    db.commit()
+    db.refresh(db_hint)
+    return db_hint
+
+@router.get("/hints/{hint_id}", response_model=HintOut)
+def get_hint(hint_id: int, db: Session = Depends(get_db)):
+    db_hint = db.query(Hints).filter(Hints.hint_id == hint_id).first() # Using Hints directly
+    if db_hint is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Hint not found")
+    return db_hint
+
+@router.get("/hints/", response_model=List[HintOut])
+def get_all_hints(
+    task_id: Optional[int] = Query(None, description="Filtra hints por ID de tarea"),
+    skip: int = Query(0, description="Número de hints a omitir para paginación"),
+    limit: int = Query(100, description="Número máximo de hints a devolver para paginación"),
+    db: Session = Depends(get_db)
+):
+    query = db.query(Hints) # Using Hints directly
+    if task_id is not None:
+        query = query.filter(Hints.task_id == task_id) # Using Hints directly
+    
+    hints = query.offset(skip).limit(limit).all()
+    return hints
+
+@router.get("/hints/next")
+def get_next_hint(user_id: int, task_id: int, db: Session = Depends(get_db)):
+    used_hint_ids = db.query(UsedHint.hint_id).filter_by(
+        user_id=user_id,
+        task_id=task_id
+    ).subquery()
+
+    next_hint = db.query(Hints).filter(
+        Hints.task_id == task_id,
+        ~Hints.hint_id.in_(used_hint_ids)
+    ).order_by(Hints.hint_order.asc()).first()
+
+    if not next_hint:
+        return {"message": "No hay más hints disponibles", "hint": None}
+
+    return {
+        "hint_id": next_hint.hint_id,
+        "hint_text": next_hint.hint_text,
+        "penalty_points": next_hint.penalty_points
+    }
+
+
+# --- Resto de tus Endpoints existentes (sin cambios) ---
+
+@router.post("/tasks")
 @router.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db_task = Tasks(**task.model_dump())
@@ -124,7 +222,7 @@ def delete_test(test_id: int, db: Session = Depends(get_db)):
 
 @router.post("/enviar")
 def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
-    code_input_2_object = CodeInput2(code=submission.code, call="suma(1,2)")
+    # code_input_2_object = CodeInput2(code=submission.code, call="suma(1,2)")
     veredicts = []
 
     task_i = db.query(Tasks).filter(Tasks.id == submission.taskId).first()
@@ -159,13 +257,25 @@ def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
             "output": result["output"].rstrip('\n')
         })
     
+    # Calcular penalización por hints
+    penalidad_total = db.query(func.sum(Hints.penalty_points)).join(
+        UsedHint, UsedHint.hint_id == Hints.hint_id
+    ).filter(
+        UsedHint.user_id == submission.UserId,
+        UsedHint.task_id == submission.taskId
+    ).scalar() or 0.0
+
+    # Aquí puedes usar `menos` como penalización total
+    menos = float(penalidad_total)
+    nuevos_puntos = countACs - menos
+
     nueva_submission = Submission(
         user_id=submission.UserId,
         code=submission.code,
         result=generalVeredict,
         task_id=submission.taskId,
         tipo_problema="tasks",
-        score=countACs
+        score=nuevos_puntos
     )
 
 
@@ -176,3 +286,4 @@ def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
         "generalVeredict": generalVeredict,
         "testCases": veredicts
     }
+

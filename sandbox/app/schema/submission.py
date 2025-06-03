@@ -8,7 +8,7 @@ class Submission(BaseModel):
     task_id: Optional[int] = None
     code_task_id: Optional[int] = None
     tipo_problema: str
-    score: Optional[int] = None
+    score: Optional[float] = None
 
 class SubmissionBase(BaseModel):
     user_id: int
@@ -28,7 +28,7 @@ class SubmissionCreate(SubmissionBase):
 class SubmissionUpdate(BaseModel):
     code: Optional[str] = None
     result: Optional[str] = None
-    score: Optional[int] = None
+    score: Optional[float] = None
 
 class SubmissionOut(SubmissionBase):
     submission_id: int
@@ -36,7 +36,7 @@ class SubmissionOut(SubmissionBase):
     task_id: Optional[int] = None
     code_task_id: Optional[int] = None
     tipo_problema: str
-    score: Optional[int] = None
+    score: Optional[float] = None
 
     class Config:
         from_attributes = True

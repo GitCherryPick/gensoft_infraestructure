@@ -327,6 +327,31 @@ async def update_coding_task(task_id: int, task_update: dict):
 async def delete_coding_task(task_id: int):
     return await call_service("sandbox", "DELETE", f"/tasks/{task_id}")
 
+# --- Hint Endpoints (Fixed) ---
+@router.post("/hints/")
+async def create_hint(hint_data: dict):
+    """Crea una nueva pista"""
+    return await call_service("sandbox", "POST", "/hints/", data=hint_data)
+
+@router.get("/hints/{hint_id}")
+async def get_hint(hint_id: int):
+    """Obtiene una pista por ID"""
+    return await call_service("sandbox", "GET", f"/hints/{hint_id}")
+
+@router.put("/hints/{hint_id}")
+async def update_hint(hint_id: int, hint_data: dict):
+    """Actualiza una pista existente"""
+    return await call_service("sandbox", "PUT", f"/hints/{hint_id}", data=hint_data)
+
+@router.delete("/hints/{hint_id}")
+async def delete_hint(hint_id: int):
+    """Elimina una pista"""
+    return await call_service("sandbox", "DELETE", f"/hints/{hint_id}")
+
+@router.get("/hints/")
+async def list_hints():
+    """Obtiene todas las pistas"""
+    return await call_service("sandbox", "GET", "/hints")
 # Submission Endpoints
 @router.post("/enviar")
 async def submit_solution(submission_data: dict):
