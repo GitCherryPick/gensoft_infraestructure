@@ -102,7 +102,7 @@ async def create_institution(institution_data: dict):
 
 @router.get("/institutions")
 async def list_institutions(skip: int = 0, limit: int = 10):
-    return await call_service("user", "GET", "/institutions", params={"skip": skip, "limit": limit})
+    return await call_service("user", "GET", "/institutions/", params={"skip": skip, "limit": limit})
 
 @router.put("/institutions/{institution_id}")
 async def update_institution(institution_id: int, institution_data: dict):
@@ -316,8 +316,8 @@ async def get_coding_task(task_id: int):
     return await call_service("sandbox", "GET", f"/tasks/{task_id}")
 
 @router.get("/tasks")
-async def list_coding_tasks(skip: int = 0, limit: int = 10):
-    return await call_service("sandbox", "GET", "/tasks", params={"skip": skip, "limit": limit})
+async def list_coding_tasks():
+    return await call_service("sandbox", "GET", "/tasks")
 
 @router.put("/tasks/{task_id}")
 async def update_coding_task(task_id: int, task_update: dict):
@@ -372,7 +372,7 @@ async def create_task(task: dict):
 
 @router.get("/sandbox/taskcode")
 async def get_all_tasks(skip: int = 0, limit: int = 100):
-    return await call_service("sandbox", "GET", "/taskcode", params={"skip": skip, "limit": limit})
+    return await call_service("sandbox", "GET", "/taskcode/", params={"skip": skip, "limit": limit})
 
 @router.get("/sandbox/taskcode/{id}")
 async def read(id: int):
@@ -401,6 +401,42 @@ async def ai_feedback_replicator(input: dict):
 @router.post("/sandbox/ai-feedback/lab")
 async def ai_feedback_lab(input: dict):
     return await call_service("sandbox", "POST", "/ai-feedback/lab", data=input)
+
+@router.post("/sandbox/submissions")
+async def create_submission(submission_data: dict):
+    return await call_service("sandbox", "POST", "/submissions", data=submission_data)
+
+@router.get("/sandbox/submissions")
+async def get_all_submissions(skip: int = 0, limit: int = 100):
+    return await call_service("sandbox", "GET", "/submissions/", params={"skip": skip, "limit": limit})
+
+@router.get("/sandbox/submissions/{submission_id}")
+async def get_with_submission_id(submission_id: int):
+    return await call_service("sandbox", "GET", f"/submissions/{submission_id}")
+
+@router.put("/sandbox/submissions/{submission_id}")
+async def update_with_submission_id(submission_id: int, submission_data:dict):
+    return await call_service("sandbox", "PUT", f"/submissions/{submission_id}", data=submission_data)
+
+@router.delete("/sandbox/submissions/{submission_id}")
+async def delete_with_submission_id(submission_id: int):
+    return await call_service("sandbox", "DELETE", f"/submissions/{submission_id}")
+
+@router.get("/sandbox/submissions/task/{task_id}")
+async def get_submissions_by_task_id(task_id: int):
+    return await call_service("sandbox", "GET", f"/submissions/task/{task_id}")
+
+@router.get("/sandbox/submissions/task/{task_id}/{user_id}")
+async def get_submissions_by_task_and_user(task_id: int, user_id: int):
+    return await call_service("sandbox", "GET", f"/submissions/task/{task_id}/{user_id}")
+
+@router.put("/sandbox/task/{task_id}/close")
+async def close_task(task_id: int):
+    return await call_service("sandbox", "PUT", f"/task/{task_id}/close")
+
+@router.get("/sandbox/submissions/task/{task_id}/generate-missing-submissions")
+async def generate_missing_submissions(task_id: int):
+    return await call_service("sandbox", "GET", f"/submissions/task/{task_id}/generate-missing-submissions")
 
 ## Replication Submissions Endpoints
 @router.post("/replication-submissions/")
@@ -458,3 +494,7 @@ async def ask_ai_feedback_labs(question: dict):
 @router.post("/feedback/exercise")
 async def create_feedback_task(task: dict):
     return await call_service("user", "POST", "/feedback/exercise", data=task)
+
+@router.get("/feedback/exercise/{task_id}")
+async def get_feedback_task(task_id: int):
+    return await call_service("user", "GET", f"/feedback/exercise/{task_id}")

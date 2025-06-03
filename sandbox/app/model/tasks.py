@@ -13,5 +13,6 @@ class Tasks(Base):
     date_limit = Column(DateTime, nullable = True)
     grade = Column(Integer, nullable = True)
     created_at = Column(TIMESTAMP, default=datetime.now)
+    status = Column(String(7), default="Abierta")
 
     tests = relationship("Tests", backref="task", cascade="all, delete-orphan")

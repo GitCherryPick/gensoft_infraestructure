@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -63,3 +64,10 @@ def delete_user(user_username: str, db: Session = Depends(get_db)):
     db.delete(user)
     db.commit()
     return None
+
+@router.post("/batch_users")
+def obtain_users_by_ids(users_ids: List[int], db: Session = Depends(get_db)):
+    users = db.query(User).filter(User.id.in_(users_ids)).all()
+    if not users:
+        raise HTTPException(status_code=404, detail="No users found")
+    return [{"id": user.id, "name": user.full_name} for user in users]

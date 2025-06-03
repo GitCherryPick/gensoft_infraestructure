@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import Optional, List
 
@@ -16,8 +17,11 @@ from app.model.tasks import Tasks
 from app.model.tests import Tests
 from app.model.submissions import Submission
 from app.model.tests import Tests
+from app.services.submissions_user import generate_missing_submissions
+
 from app.model.hints import Hints
 from app.model.UsedHint import UsedHint
+from sqlalchemy import func
 
 from app.database import get_db
 
@@ -113,7 +117,6 @@ def get_next_hint(user_id: int, task_id: int, db: Session = Depends(get_db)):
 
 # --- Resto de tus Endpoints existentes (sin cambios) ---
 
-@router.post("/tasks")
 @router.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db_task = Tasks(**task.model_dump())
@@ -258,21 +261,24 @@ def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
     penalidad_total = db.query(func.sum(Hints.penalty_points)).join(
         UsedHint, UsedHint.hint_id == Hints.hint_id
     ).filter(
-        UsedHint.user_id == submission.UserId,
+        UsedHint.user_id == submission.userId,
         UsedHint.task_id == submission.taskId
     ).scalar() or 0.0
 
     # Aquí puedes usar `menos` como penalización total
     menos = float(penalidad_total)
     nuevos_puntos = countACs - menos
+    puntos_totales = (nuevos_puntos*task_i.grade)/ len(test_cases)
 
     nueva_submission = Submission(
-        user_id=submission.UserId,
+        user_id=submission.userId,
         code=submission.code,
-        result=generalVeredict,
+        result=generalVeredict + submission.result,
         task_id=submission.taskId,
         tipo_problema="tasks",
-        score=nuevos_puntos
+        score=puntos_totales,
+        test_feedback=veredicts,
+        autofeedback_id=submission.autofeedback_id,
     )
 
 
@@ -284,3 +290,17 @@ def enviar(submission: SubmissionInput, db: Session = Depends(get_db)):
         "testCases": veredicts
     }
 
+@router.put("/task/{task_id}/close")
+async def close_task(task_id:int, db: Session = Depends(get_db)):
+    task = db.query(Tasks).filter(Tasks.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    if task.status == "Cerrada":
+        return {"message": "La tarea ya está cerrada"}
+    
+    task.status = "Cerrada"
+    db.commit()
+
+    await generate_missing_submissions(task_id, db)
+
+    return {"message": "Tarea cerrada y envíos generados para estudiantes sin envíos previos"}
