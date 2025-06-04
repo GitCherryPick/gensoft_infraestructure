@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.model import User, StudentTransfer
+from app.model.roles import Role
 from app.schema.users import UserCreate, UserResponse
 from app.schema.student_transfers import StudentTransferCreate, StudentTransferResponse
 from app.database import get_db
@@ -43,7 +44,13 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         full_name=user.full_name or "",
         status="active",
     )
-    
+
+    # Consulta ORM normal
+    roles = db.query(Role).all()
+    print("ORM roles:", roles)
+
+    tip = db.query(User).all()
+    print("ORM users:", tip)
     try:
         db.add(db_user)
         db.commit()
