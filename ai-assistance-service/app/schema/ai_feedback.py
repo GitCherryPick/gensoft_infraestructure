@@ -25,4 +25,12 @@ class LabFeedback(BaseModel):
     
     class Config:
         from_attributes = True
+
+class TestFeedback(BaseModel):
+    feedback_general: str
+    feedback_test: List[str]
+    feedback_positive: str
+
+    class Config:
+        from_attributes = True
         

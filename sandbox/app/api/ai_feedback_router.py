@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from app.core.ai_feedback import get_feedback_ai, get_pruebita, get_feedback_ai_lab
+from app.core.ai_feedback import get_feedback_ai, get_pruebita, get_feedback_ai_lab, get_feedback_ai_lab_test
 from app.schema.replicator_prev import ResultReplicator, ReplicatedFeedback
-from app.schema.lab_prev import LabFeedback, LabRequest
+from app.schema.lab_prev import LabFeedback, LabRequest, TestFeedback, LabTestRequest, ErrorFeedback
+from app.core.executor import run_code
 
 router = APIRouter()
 
@@ -39,3 +40,25 @@ async def ask_ai_feedback_labs(request: LabRequest):
         import json
         response = json.loads(response)
     return LabFeedback(**response)
+
+@router.post("/ai-feedback/lab-test", response_model=TestFeedback)
+async def ask_ai_lab_test(request: LabTestRequest):
+    """
+    Asking a question for tests in lab code support.
+    """
+    response = await get_feedback_ai_lab_test(request)
+    
+    if not response:
+        raise HTTPException(status_code=418, detail="Bad connection with ai-ms")
+    
+    if isinstance(response, str):
+        import json
+        response = json.loads(response)
+    errors_to_run = run_code(request.codigo_estudiante)
+    print(errors_to_run, "llegue endgame")
+    errors_response = ErrorFeedback(
+        error = errors_to_run['error'], 
+        line = errors_to_run['line']
+    )
+
+    return TestFeedback(**response, errores=errors_response)
