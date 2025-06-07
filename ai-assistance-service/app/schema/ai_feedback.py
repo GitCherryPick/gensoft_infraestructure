@@ -13,7 +13,7 @@ class ReplicatedFeedback(BaseModel):
 
 class ErrorFeedback(BaseModel):
     error: str
-    line: int
+    line: str
 
     class Config:
         from_attributes = True

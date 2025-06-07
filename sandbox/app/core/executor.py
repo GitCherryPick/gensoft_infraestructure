@@ -8,7 +8,6 @@ def run_code(code: str):
         tmp.write(code)
         tmp.flush()
     result = subprocess.run(["python", tmp.name], capture_output=True, text=True, timeout=3)
-
     return {
         "output": result.stdout,
         "error": result.stderr.strip().split("\n")[-1] if result.stderr else "",

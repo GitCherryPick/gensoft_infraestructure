@@ -438,6 +438,10 @@ async def close_task(task_id: int):
 async def generate_missing_submissions(task_id: int):
     return await call_service("sandbox", "GET", f"/submissions/task/{task_id}/generate-missing-submissions")
 
+@router.post("/sandbox/ai-feedback/lab-test")
+async def feedback_student_in_lab(input: dict):
+    return await call_service("sandbox", "POST", "/ai-feedback/lab-test", data=input)
+
 ## Replication Submissions Endpoints
 @router.post("/replication-submissions/")
 async def create_replication_submission(submission_data: dict):
