@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types
 import os
 from typing import Union
-from app.schema.ai_feedback import ReplicatedFeedback, LabFeedback
+from app.schema.ai_feedback import ReplicatedFeedback, LabFeedback, TestFeedback
 
 chat_sessions: Dict[str, any] = {}
 api_key_gensoft = os.getenv('AI_API_KEY')
@@ -63,6 +63,21 @@ def ask_ai_feedback_lab(question_text: str):
         config={
             "response_mime_type": "application/json",
             "response_schema": LabFeedback
+        }
+    )
+    return response.text
+
+def ask_ai_test_progress(question_text: str):
+    """
+    Asking a question to an AI model about status of test progress without calls
+    """
+    client = genai.Client(api_key=api_key_gensoft)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=question_text,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": TestFeedback
         }
     )
     return response.text

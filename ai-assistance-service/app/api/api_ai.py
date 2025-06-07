@@ -2,13 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.api_ai import ask_ai as ask_ai_core
 from app.core.api_ai import conversate_ai as conversate_ai_core 
-from app.core.api_ai import ask_ai_feedback_rep
-from app.core.api_ai import ask_ai_feedback_lab
+from app.core.api_ai import ask_ai_feedback_rep, ask_ai_test_progress, ask_ai_feedback_lab
 from app.schema.ai_question import AIQuestion, AIResponse, AIConversateResponse
 from app.schema.chat_interaction import ChatInput, ChatOutput
 from app.schema.ai_feedback import ReplicatedFeedback, LabFeedback
 from app.model.chat_interaction import ChatInteraction
 from app.database import get_db
+
 from app.db.chat_db import save_important_message
 router = APIRouter()
 
@@ -36,6 +36,16 @@ def ask_ai_feedback_labs(ai_question: AIQuestion):
     Asking a question for lab code support.
     """
     response = ask_ai_feedback_lab(ai_question.question)
+    if not response:
+        raise HTTPException(status_code=418, detail="Bad connection with ai-assistance-ms")
+    return response
+
+@router.post("/ask-feedback/test-lab")
+def ask_ai_feedback_labs_tests(ai_question: AIQuestion):
+    """
+    Asking a question for lab test progress support.
+    """
+    response = ask_ai_test_progress(ai_question.question)
     if not response:
         raise HTTPException(status_code=418, detail="Bad connection with ai-assistance-ms")
     return response

@@ -6,8 +6,8 @@ router = APIRouter()
 
 @router.post("/run", tags=["executor"])
 def run_python_code(payload: CodeInput):
-    stdout, stderr = executor.run_code(payload.code)
-    return {"output": stdout, "errors": stderr}
+    result_run = executor.run_code(payload.code)
+    return result_run
 
 @router.post("/execute", tags=["executor"])
 def execute_code(payload: CodeInput2):
