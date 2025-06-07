@@ -505,3 +505,7 @@ async def create_feedback_task(task: dict):
 @router.get("/feedback/exercise/{task_id}")
 async def get_feedback_task(task_id: int):
     return await call_service("user", "GET", f"/feedback/exercise/{task_id}")
+
+@router.put("/feedback/exercise/{task_id}")
+async def update_feedback_task(task_id: int, task:dict):
+    return await call_service("user", "PUT", f"/feedback/exercise/{task_id}", data=task)

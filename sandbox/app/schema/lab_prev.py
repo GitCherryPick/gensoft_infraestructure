@@ -36,6 +36,7 @@ class TestFeedback(BaseModel):
     feedback_general: str
     feedback_test: List[str]
     feedback_positive: str
+    feedback_docente: str
     errores: Optional[ErrorFeedback]
 
     class Config:

@@ -1,5 +1,5 @@
 from app.model.feedback_tasks import FeedbackTask
-from app.schema.feedback_tasks import FeedbackTaskRequest, FeedbackTaskResponse
+from app.schema.feedback_tasks import FeedbackTaskRequest, FeedbackTaskResponse, FeedbackTaskUpdate
 from sqlalchemy.orm import Session
 
 def create_feedback(db: Session, task: FeedbackTaskRequest):
@@ -36,3 +36,18 @@ def get_feedback_by_id(db: Session, feedback_id: int):
     Get a feedback task by its ID.
     """
     return db.query(FeedbackTask).filter(FeedbackTask.id == feedback_id).first()
+
+def update_feedback_by_id(db: Session, feedback_id: int, new_task: FeedbackTaskUpdate):
+    """
+    Update feedback task by its ID
+    """
+    feedback_task = get_feedback_by_id(db, feedback_id)
+    if not feedback_task:
+        return None
+    for field, value in new_task.model_dump(exclude_unset=True).items():
+        setattr(feedback_task, field, value)
+    db.commit()
+    db.refresh(feedback_task)
+    return feedback_task
+    
+    

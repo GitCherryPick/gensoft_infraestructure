@@ -107,10 +107,10 @@ async def get_feedback_ai_lab_test(content: LabTestRequest):
     Eres un evaluador de código python, tu tarea es analizar el código proporcionado por el estudiante: {content.codigo_estudiante}. Dado el contexto del ejercicio: 
     {content.enunciado}, para los campos resultantes considera:
     *   "feedback_general": Una descripcion de los errores o warnings del código del estudiante, pensada para el estudiante, con lenguaje no muy tecnico. 
-    *   "feedback_test": Dado {content.test_set} para cada test, la razon por la que no esta pasando correctamente. 
-    *   "feedback_positive": Algunos codigos seran largos, comienza con una frase como "Has logrado avanzar correctamente hasta " y menciona puntos a favor del codigo, el estudiante esta 
-    aprendiendo el lenguaje python.
-    NOTA: Es importante no mencionar la solucion del ejercicio, solamente errores o el estado de hasta donde llego correctamente el estudiante. 
+    *   "feedback_test": Dado {content.test_set} para cada test, la razon por la que no esta pasando correctamente. Debes ser muy estricto con esto: Es muy importante que sintacticamente sea escrito de igual manera el nombre de la función a testear, de lo contrario no pasará correctamente.
+    *   "feedback_positive": Algunos codigos son largos, comienza con una frase como "Has logrado avanzar correctamente hasta " y menciona puntos a favor del codigo, el estudiante está aprendiendo el lenguaje python.
+    *   "feedback_docente": Una descripcion de los errores o warnings del código del estudiante, pensada para el docente, de manera breve pero dando enfasis en la logica y lo que le hace falta mejorar.
+    NOTA: Es importante no mencionar la solucion del ejercicio, solamente errores o el estado de hasta donde llego correctamente el estudiante. Recuerda que la logica podria estar bien pero es importante que cumpla el enunciado, como tambien el nombre de la funcion.
     """
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
