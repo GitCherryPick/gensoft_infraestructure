@@ -6,7 +6,8 @@ class UserCreate(BaseModel):
     username: constr(max_length=50)
     email: str
     password: str
-    full_name: Optional[str] 
+    full_name: Optional[str]
+    role: Optional[str]
 
 class UserResponse(BaseModel):
     id: int
