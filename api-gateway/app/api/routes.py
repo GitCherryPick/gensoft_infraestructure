@@ -82,6 +82,10 @@ async def delete_user(user_username: str):
 @router.post("/users/")
 async def create_user(user_data: dict):
     return await call_service("user", "POST", "/users/", data=user_data)
+@router.post("/auth/login")
+async def login(login_data: dict):
+    return await call_service("user", "POST", "/auth/login", data=login_data)
+
 # Password Reset Endpoints
 @router.post("/auth/password-reset/request")
 async def request_password_reset(reset_request: dict):
