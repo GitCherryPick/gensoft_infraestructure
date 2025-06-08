@@ -231,18 +231,16 @@ jobs:
           fi
         done
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [build-and-run]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: [build-and-run]
+#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+#    steps:
+#    - name: Checkout code
+#      uses: actions/checkout@v3
 
-    - name: Deploy to staging
-      run: |
-        echo "🚀 Deploying to staging environment..."
-        echo "Deployment would happen here with your specific deployment strategy"
-        # Add your deployment commands here
-        # For example: kubectl apply, docker push, etc.
+#    - name: Deploy to staging
+#      run: |
+#        echo "🚀 Deploying to staging environment..."
+#        echo "Deployment would happen here with your specific deployment strategy"
