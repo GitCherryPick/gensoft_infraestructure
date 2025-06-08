@@ -55,7 +55,6 @@ async def ask_ai_lab_test(request: LabTestRequest):
         import json
         response = json.loads(response)
     errors_to_run = run_code(request.codigo_estudiante)
-    print(errors_to_run, "llegue endgame")
     errors_response = ErrorFeedback(
         error = errors_to_run['error'], 
         line = errors_to_run['line']
