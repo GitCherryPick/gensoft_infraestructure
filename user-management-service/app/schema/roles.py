@@ -8,7 +8,7 @@ class TypeRole(enum.Enum):
     STUDENT = "student"
 
 class RoleBase(BaseModel):
-    name: TypeRole
+    name: str
     description: Optional[constr(max_length=255)] 
    
 class RoleResponse(RoleBase):
