@@ -1,7 +1,8 @@
-from fastapi import Query,APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import Query,APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request, Response 
 import httpx
 import os
 from typing import Optional
+from fastapi.responses import StreamingResponse
 
 router = APIRouter()
 
@@ -19,7 +20,8 @@ async def call_service(
     endpoint: str,
     data: Optional[dict] = None,
     params: Optional[dict] = None,
-    files: Optional[dict] = None
+    files: Optional[dict] = None,
+    stream: bool = False
 ):
     """
     Generic function to call any microservice
@@ -43,6 +45,8 @@ async def call_service(
                 params=params
             )
             response.raise_for_status()
+            if stream:
+                return response
             return response.json()
             
     except httpx.HTTPStatusError as e:
@@ -56,6 +60,33 @@ async def call_service(
             status_code=503,
             detail=f"{service_name.capitalize()} service unavailable: {str(e)}"
         )
+
+@router.get("/storage/{path:path}")
+async def get_static_file(path: str):
+    """
+    Proxy endpoint for static files from content service
+    """
+    try:
+        response = await call_service(
+            "content",
+            "GET",
+            f"/storage/{path}",
+            stream=True
+        )
+       
+        return StreamingResponse(
+            content=response.aiter_bytes(),
+            status_code=response.status_code,
+            media_type=response.headers.get("content-type"),
+            headers=dict(response.headers)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f"File not found: {str(e)}"
+        )
+
+
 # User Management Endpoints
 # User Management Endpoints
 # User Management Endpoints
@@ -82,6 +113,10 @@ async def delete_user(user_username: str):
 @router.post("/users/")
 async def create_user(user_data: dict):
     return await call_service("user", "POST", "/users/", data=user_data)
+@router.post("/auth/login")
+async def login(login_data: dict):
+    return await call_service("user", "POST", "/auth/login", data=login_data)
+
 # Password Reset Endpoints
 @router.post("/auth/password-reset/request")
 async def request_password_reset(reset_request: dict):
