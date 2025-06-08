@@ -11,6 +11,7 @@ from app.api import grade
 from app.api import student_transfer
 from app.api import feedback_tasks
 from app.api.reset_password import router as reset_password_router
+from app.api import roles
 
 import sys
 import os
@@ -41,3 +42,4 @@ app.include_router(user.router, tags=["users"])
 app.include_router(grade.router, tags=["grades"])
 app.include_router(student_transfer.router, tags=["student_transfers"])
 app.include_router(feedback_tasks.router, prefix="/feedback", tags=["feedback"])
+app.include_router(roles.router, tags=["roles"])
