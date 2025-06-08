@@ -23,11 +23,6 @@
 	git clone https://github.com/GitCherryPick/gensoft_infraestructure.git
 	cd gensoft_infraestructure
 
-
-# Ejecutar la aplicación
-### Antes de la ejecición se debe abrir docker desktop
-	uvicorn app.main:app --reload
-
 ## Para ejecutar con Docker:
 ### User-service
 Accede a la documentación automática de la API en:

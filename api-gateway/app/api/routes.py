@@ -473,6 +473,10 @@ async def close_task(task_id: int):
 async def generate_missing_submissions(task_id: int):
     return await call_service("sandbox", "GET", f"/submissions/task/{task_id}/generate-missing-submissions")
 
+@router.post("/sandbox/ai-feedback/lab-test")
+async def feedback_student_in_lab(input: dict):
+    return await call_service("sandbox", "POST", "/ai-feedback/lab-test", data=input)
+
 ## Replication Submissions Endpoints
 @router.post("/replication-submissions/")
 async def create_replication_submission(submission_data: dict):
@@ -524,6 +528,9 @@ async def chat(input_data: dict):
 async def ask_ai_feedback_labs(question: dict):
     return await call_service("ai", "POST", "/ai/ask-feedback/lab", data=question)
 
+@router.post("/ai/ai-feedaback/lab-test")
+async def ask_ai_feedback_labs_test(question: dict):
+    return await call_service("ai", "POST", "/ai/ai-feedback/lab-test", data=question)
 
 # Feedback Tasks Endpoints
 @router.post("/feedback/exercise")
@@ -533,3 +540,7 @@ async def create_feedback_task(task: dict):
 @router.get("/feedback/exercise/{task_id}")
 async def get_feedback_task(task_id: int):
     return await call_service("user", "GET", f"/feedback/exercise/{task_id}")
+
+@router.put("/feedback/exercise/{task_id}")
+async def update_feedback_task(task_id: int, task:dict):
+    return await call_service("user", "PUT", f"/feedback/exercise/{task_id}", data=task)

@@ -21,3 +21,8 @@ class FeedbackTaskResponse(FeedbackTask):
 
     class Config:
         from_attributes = True
+
+class FeedbackTaskUpdate(BaseModel):
+    task_id_lab: Optional[int] = 0
+    feedback_ai: Optional[List[str]] = []
+    feedback_docente: Optional[List[str]] = []

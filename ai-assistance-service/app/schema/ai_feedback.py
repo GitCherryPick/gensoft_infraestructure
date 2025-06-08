@@ -13,7 +13,7 @@ class ReplicatedFeedback(BaseModel):
 
 class ErrorFeedback(BaseModel):
     error: str
-    line: int
+    line: str
 
     class Config:
         from_attributes = True
@@ -23,6 +23,15 @@ class LabFeedback(BaseModel):
     warnings: Optional[List[str]]
     errores: Optional[ErrorFeedback]
     
+    class Config:
+        from_attributes = True
+
+class TestFeedback(BaseModel):
+    feedback_general: str
+    feedback_test: List[str]
+    feedback_positive: str
+    feedback_docente: str
+
     class Config:
         from_attributes = True
         
