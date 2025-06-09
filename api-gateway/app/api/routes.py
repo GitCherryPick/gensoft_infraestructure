@@ -93,7 +93,7 @@ async def get_static_file(path: str):
 
 @router.get("/users/")
 async def get_all_users(skip: int = 0, limit: int = 100):
-    return await call_service("user", "GET", "/users/", params={"skip": skip, "limit": limit})
+    return await call_service("user", "GET", "/users", params={"skip": skip, "limit": limit})
 @router.get("/users/{user_id}")
 async def get_user(user_id: int):
     return await call_service("user", "GET", f"/users/{user_id}")
@@ -112,7 +112,7 @@ async def delete_user(user_username: str):
 
 @router.post("/users/")
 async def create_user(user_data: dict):
-    return await call_service("user", "POST", "/users/", data=user_data)
+    return await call_service("user", "POST", "/users", data=user_data)
 @router.post("/auth/login")
 async def login(login_data: dict):
     return await call_service("user", "POST", "/auth/login", data=login_data)
@@ -137,7 +137,7 @@ async def create_institution(institution_data: dict):
 
 @router.get("/institutions")
 async def list_institutions(skip: int = 0, limit: int = 10):
-    return await call_service("user", "GET", "/institutions/", params={"skip": skip, "limit": limit})
+    return await call_service("user", "GET", "/institutions", params={"skip": skip, "limit": limit})
 
 @router.put("/institutions/{institution_id}")
 async def update_institution(institution_id: int, institution_data: dict):
