@@ -12,6 +12,7 @@ from app.api import student_transfer
 from app.api import feedback_tasks
 from app.api.reset_password import router as reset_password_router
 from app.api import roles
+from app.seeder import seed_roles
 
 import sys
 import os
@@ -27,9 +28,15 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-User-Data"],
 )
 
 Base.metadata.create_all(bind=engine)
+
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
+    seed_roles()
 
 @app.get("/")
 def root():

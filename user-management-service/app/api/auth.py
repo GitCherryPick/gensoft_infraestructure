@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(
     request: Request,
     login_data: LoginRequest, 
@@ -95,10 +95,11 @@ async def login(
         "X-User-Data": json.dumps(user_data, ensure_ascii=False)
     }
     
-    return JSONResponse(
-        content=response,
-        headers=response_headers
-    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_direct": user_data
+    }
 
 @router.post("/test")
 def test():
