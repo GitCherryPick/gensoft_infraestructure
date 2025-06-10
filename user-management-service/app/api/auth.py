@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(
     request: Request,
     login_data: LoginRequest, 
@@ -79,16 +79,17 @@ async def login(
         expires_delta=timedelta(minutes=2003)
     )
     
-    response = {
-        "access_token": access_token, 
-        "token_type": "bearer"
-    }
-    
     user_data = {
         "user_id": str(user.id),
         "username": user.username,
         "email": user.email,
         "full_name": user.full_name or ""
+    }
+
+    response = {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "user_direct": user_data
     }
     
     response_headers = {

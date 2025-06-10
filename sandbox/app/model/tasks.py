@@ -14,5 +14,9 @@ class Tasks(Base):
     grade = Column(Integer, nullable = True)
     created_at = Column(TIMESTAMP, default=datetime.now)
     status = Column(String(7), default="Abierta")
+    id_docente = Column(Integer, nullable=True)
+    codigo_plantilla=Column(Text, nullable=True)
+    lineas_visibles=Column(JSON, nullable=True)
+
 
     tests = relationship("Tests", backref="task", cascade="all, delete-orphan")
