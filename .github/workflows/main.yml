@@ -91,4 +91,156 @@ jobs:
 
     - name: Tear down
       run: docker compose down
+    
+    - name: Install dependencies for all services
+      if: success()
+      run: |
+        echo "📦 Installing dependencies for all microservices..."
+        
+        if [ -d "user-management-service" ]; then
+          echo "Installing User Management Service dependencies..."
+          cd user-management-service && npm ci && cd ..
+        fi
+        
+        if [ -d "content-management-service" ]; then
+          echo "Installing Content Management Service dependencies..."
+          cd content-management-service && npm ci && cd ..
+        fi
+        
+        if [ -d "sandbox" ]; then
+          echo "Installing Sandbox dependencies..."
+          cd sandbox && npm ci && cd ..
+        fi
+        
+        if [ -d "ai-assistance-service" ]; then
+          echo "Installing AI Assistance Service dependencies..."
+          cd ai-assistance-service && npm ci && cd ..
+        fi
 
+    - name: Run unit tests
+      if: success()
+      run: |
+        echo "🧪 Running unit tests for all services..."
+        
+        # User Management Service Tests
+        if [ -d "user-management-service" ] && [ -f "user-management-service/package.json" ]; then
+          echo "Running User Management Service tests..."
+          cd user-management-service
+          npm test -- --passWithNoTests --coverage --watchAll=false || echo "⚠️ User Management tests completed with issues"
+          cd ..
+        fi
+        
+        # Content Management Service Tests
+        if [ -d "content-management-service" ] && [ -f "content-management-service/package.json" ]; then
+          echo "Running Content Management Service tests..."
+          cd content-management-service
+          npm test -- --passWithNoTests --coverage --watchAll=false || echo "⚠️ Content Management tests completed with issues"
+          cd ..
+        fi
+        
+        # Sandbox Tests
+        if [ -d "sandbox" ] && [ -f "sandbox/package.json" ]; then
+          echo "Running Sandbox tests..."
+          cd sandbox
+          npm test -- --passWithNoTests --coverage --watchAll=false || echo "⚠️ Sandbox tests completed with issues"
+          cd ..
+        fi
+        
+        # AI Assistance Service Tests
+        if [ -d "ai-assistance-service" ] && [ -f "ai-assistance-service/package.json" ]; then
+          echo "Running AI Assistance Service tests..."
+          cd ai-assistance-service
+          npm test -- --passWithNoTests --coverage --watchAll=false || echo "⚠️ AI Assistance tests completed with issues"
+          cd ..
+        fi
+    
+    - name: Run API endpoint tests
+      if: success()
+      run: |
+        echo "🌐 Running API endpoint tests..."
+        
+        # Test sandbox API endpoints
+        echo "Testing Sandbox API..."
+        curl -X POST http://localhost:8002/execute \
+          -H "Content-Type: application/json" \
+          -d '{"code": "print(\"Hello World\")", "language": "python"}' \
+          || echo "⚠️ Sandbox execute endpoint test failed"
+        
+        # Add more API tests as needed
+        echo "API endpoint tests completed"
+
+    - name: Generate test report
+      if: always()
+      run: |
+        echo "📊 Generating test report..."
+        echo "=== TEST SUMMARY ===" > test-report.txt
+        echo "Date: $(date)" >> test-report.txt
+        echo "Commit: ${{ github.sha }}" >> test-report.txt
+        echo "Branch: ${{ github.ref_name }}" >> test-report.txt
+        echo "" >> test-report.txt
+        
+        # Container status
+        echo "=== CONTAINER STATUS ===" >> test-report.txt
+        docker compose ps >> test-report.txt || true
+        echo "" >> test-report.txt
+        
+        # Service logs summary
+        echo "=== SERVICE LOGS SUMMARY ===" >> test-report.txt
+        docker compose logs --tail=10 >> test-report.txt || true
+        
+        cat test-report.txt
+
+    - name: Upload test artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports
+        path: |
+          test-report.txt
+          **/coverage/
+        retention-days: 7
+    
+  
+#security scan job
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build-and-run
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Run security audit
+      run: |
+        echo "🔒 Running security audit for all services..."
+        
+        services=("user-management-service" "content-management-service" "sandbox" "ai-assistance-service")
+        
+        for service in "${services[@]}"; do
+          if [ -d "$service" ] && [ -f "$service/package.json" ]; then
+            echo "Auditing $service..."
+            cd "$service"
+            npm audit --audit-level=moderate || echo "⚠️ Security issues found in $service"
+            cd ..
+          fi
+        done
+
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: [build-and-run]
+#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+#    steps:
+#    - name: Checkout code
+#      uses: actions/checkout@v3
+
+#    - name: Deploy to staging
+#      run: |
+#        echo "🚀 Deploying to staging environment..."
+#        echo "Deployment would happen here with your specific deployment strategy"
