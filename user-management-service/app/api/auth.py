@@ -79,27 +79,27 @@ async def login(
         expires_delta=timedelta(minutes=2003)
     )
     
-    response = {
-        "access_token": access_token, 
-        "token_type": "bearer"
-    }
-    
     user_data = {
         "user_id": str(user.id),
         "username": user.username,
         "email": user.email,
         "full_name": user.full_name or ""
     }
+
+    response = {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "user_direct": user_data
+    }
     
     response_headers = {
         "X-User-Data": json.dumps(user_data, ensure_ascii=False)
     }
     
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user_direct": user_data
-    }
+    return JSONResponse(
+        content=response,
+        headers=response_headers
+    )
 
 @router.post("/test")
 def test():

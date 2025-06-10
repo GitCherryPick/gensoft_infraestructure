@@ -117,21 +117,26 @@ def get_next_hint(user_id: int, task_id: int, db: Session = Depends(get_db)):
 
 # --- Resto de tus Endpoints existentes (sin cambios) ---
 
-@router.post("/tasks", status_code=status.HTTP_201_CREATED)
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
-    db_task = Tasks(**task.model_dump())
+@router.post("/tasks", response_model=TaskOut, status_code=status.HTTP_201_CREATED)
+def create_task(task: TaskCreate, db: Session=Depends(get_db)):
+    task_data = task.model_dump()
+    tests_data = task_data.pop('tests', [])
+    db_task = Tasks(**task_data)
     db.add(db_task)
+    db.flush()  
+    
+    for test_data in tests_data:
+        db_test = Tests(
+            task_id = db_task.id,
+            input=test_data["input"],
+            output=test_data["output"]
+        )
+        db.add(db_test)
     db.commit()
     db.refresh(db_task)
-    
-    for test in task.tests:
-        db_test = Tests(task_id=db_task.id, input=test.input, output=test.output)
-        db.add(db_test)
+    return db_task
 
-    db.commit()
-    return {"message": "Tarea creada con éxito", "task_id": db_task.id}
-
-@router.get("/tasks")
+@router.get("/tasks", response_model=List[TaskOut])
 def get_tasks(db: Session = Depends(get_db)):
     tasks = db.query(Tasks).all()
     return tasks
