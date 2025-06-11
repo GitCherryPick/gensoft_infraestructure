@@ -5,6 +5,9 @@ from datetime import datetime
 class TestBase(BaseModel):
     input: str
     output: str
+    
+    class Config:
+        from_attributes = True
 
 class TestCreate(TestBase):
     pass
@@ -24,8 +27,11 @@ class TaskCreate(TaskBase):
     tests: Optional[List[TestCreate]] = []
     pistas: Optional[List[str]] = []
     date_limit: Optional[datetime] = None
-    grade: Optional[int] = None
+    grade: Optional[int] = 0
     status: Optional[str] = "Abierta"
+    id_docente: Optional[int] = 0
+    codigo_plantilla: Optional[str] = ""
+    lineas_visibles: Optional[List[int]] = []
 
 class TaskOut(TaskBase):
     id: int
@@ -35,6 +41,9 @@ class TaskOut(TaskBase):
     date_limit: Optional[datetime] = None
     grade: Optional[int] = None
     status: Optional[str] = "Abierta"
+    id_docente: Optional[int] = 0
+    codigo_plantilla: Optional[str] = ""
+    lineas_visibles: Optional[List[int]] = []
 
     class Config:
         from_attributes = True
@@ -44,5 +53,8 @@ class TaskUpdate(BaseModel):
     enunciado: str
     pistas: Optional[List[str]] = []
     date_limit: Optional[datetime] = None
-    grade: Optional[int] = None
+    grade: Optional[int] = 0
     status: Optional[str] = "Abierta"
+    id_docente: Optional[int] = None
+    codigo_plantilla: Optional[str] = ""
+    lineas_visibles: Optional[List[int]] = []

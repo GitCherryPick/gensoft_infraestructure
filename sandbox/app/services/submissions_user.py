@@ -39,7 +39,7 @@ async def get_usernames_batch(user_ids: List[int]):
 async def get_students_of_course(task_id: int):
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(f"{USER_MANAGEMENT_URL}/users/")
+            response = await client.get(f"{USER_MANAGEMENT_URL}/users/users-students")
             response.raise_for_status()
             user_data = response.json()
             return user_data

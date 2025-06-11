@@ -1,7 +1,8 @@
-from fastapi import Query,APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import Query,APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request, Response 
 import httpx
 import os
 from typing import Optional
+from fastapi.responses import StreamingResponse, JSONResponse
 
 router = APIRouter()
 
@@ -19,7 +20,8 @@ async def call_service(
     endpoint: str,
     data: Optional[dict] = None,
     params: Optional[dict] = None,
-    files: Optional[dict] = None
+    files: Optional[dict] = None,
+    stream: bool = False
 ):
     """
     Generic function to call any microservice
@@ -43,6 +45,8 @@ async def call_service(
                 params=params
             )
             response.raise_for_status()
+            if stream:
+                return response
             return response.json()
             
     except httpx.HTTPStatusError as e:
@@ -56,6 +60,33 @@ async def call_service(
             status_code=503,
             detail=f"{service_name.capitalize()} service unavailable: {str(e)}"
         )
+
+@router.get("/storage/{path:path}")
+async def get_static_file(path: str):
+    """
+    Proxy endpoint for static files from content service
+    """
+    try:
+        response = await call_service(
+            "content",
+            "GET",
+            f"/storage/{path}",
+            stream=True
+        )
+       
+        return StreamingResponse(
+            content=response.aiter_bytes(),
+            status_code=response.status_code,
+            media_type=response.headers.get("content-type"),
+            headers=dict(response.headers)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f"File not found: {str(e)}"
+        )
+
+
 # User Management Endpoints
 # User Management Endpoints
 # User Management Endpoints
@@ -63,6 +94,7 @@ async def call_service(
 @router.get("/users/")
 async def get_all_users(skip: int = 0, limit: int = 100):
     return await call_service("user", "GET", "/users/", params={"skip": skip, "limit": limit})
+
 @router.get("/users/{user_id}")
 async def get_user(user_id: int):
     return await call_service("user", "GET", f"/users/{user_id}")
@@ -82,6 +114,22 @@ async def delete_user(user_username: str):
 @router.post("/users/")
 async def create_user(user_data: dict):
     return await call_service("user", "POST", "/users/", data=user_data)
+
+@router.post("/auth/login")
+async def login(login_data: dict):
+    try:
+        response = await call_service("user", "POST", "/auth/login", data=login_data)
+        return JSONResponse(
+            content=response,
+            headers={"accept": "application/json"}
+        )
+    except HTTPException as e:
+        return JSONResponse(
+            content={"detail": str(e.detail)},
+            status_code=e.status_code,
+            headers={"accept": "application/json"}
+        )
+
 # Password Reset Endpoints
 @router.post("/auth/password-reset/request")
 async def request_password_reset(reset_request: dict):
@@ -100,9 +148,9 @@ async def get_institution(institution_id: int):
 async def create_institution(institution_data: dict):
     return await call_service("user", "POST", "/institutions", data=institution_data)
 
-@router.get("/institutions")
+@router.get("/institutions/")
 async def list_institutions(skip: int = 0, limit: int = 10):
-    return await call_service("user", "GET", "/institutions/", params={"skip": skip, "limit": limit})
+    return await call_service("user", "GET", "/institutions", params={"skip": skip, "limit": limit})
 
 @router.put("/institutions/{institution_id}")
 async def update_institution(institution_id: int, institution_data: dict):
@@ -124,9 +172,9 @@ async def get_content(content_id: int):
 async def create_content(content_data: dict):
     return await call_service("content", "POST", "/contents/", data=content_data)
 
-@router.get("/contents")
+@router.get("/contents/")
 async def get_contents(skip: int = 0, limit: int = 100):
-    return await call_service("content", "GET", "/contents", params={"skip": skip, "limit": limit})
+    return await call_service("content", "GET", "/contents/", params={"skip": skip, "limit": limit})
 
 @router.get("/contents/module/{module_id}")
 async def get_contents_by_module(module_id: int):
@@ -438,6 +486,10 @@ async def close_task(task_id: int):
 async def generate_missing_submissions(task_id: int):
     return await call_service("sandbox", "GET", f"/submissions/task/{task_id}/generate-missing-submissions")
 
+@router.post("/sandbox/ai-feedback/lab-test")
+async def feedback_student_in_lab(input: dict):
+    return await call_service("sandbox", "POST", "/ai-feedback/lab-test", data=input)
+
 ## Replication Submissions Endpoints
 @router.post("/replication-submissions/")
 async def create_replication_submission(submission_data: dict):
@@ -489,6 +541,9 @@ async def chat(input_data: dict):
 async def ask_ai_feedback_labs(question: dict):
     return await call_service("ai", "POST", "/ai/ask-feedback/lab", data=question)
 
+@router.post("/ai/ai-feedaback/lab-test")
+async def ask_ai_feedback_labs_test(question: dict):
+    return await call_service("ai", "POST", "/ai/ai-feedback/lab-test", data=question)
 
 # Feedback Tasks Endpoints
 @router.post("/feedback/exercise")
@@ -498,3 +553,7 @@ async def create_feedback_task(task: dict):
 @router.get("/feedback/exercise/{task_id}")
 async def get_feedback_task(task_id: int):
     return await call_service("user", "GET", f"/feedback/exercise/{task_id}")
+
+@router.put("/feedback/exercise/{task_id}")
+async def update_feedback_task(task_id: int, task:dict):
+    return await call_service("user", "PUT", f"/feedback/exercise/{task_id}", data=task)

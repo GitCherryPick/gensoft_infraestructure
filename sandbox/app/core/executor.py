@@ -8,8 +8,11 @@ def run_code(code: str):
         tmp.write(code)
         tmp.flush()
     result = subprocess.run(["python", tmp.name], capture_output=True, text=True, timeout=3)
-
-    return result.stdout, result.stderr
+    return {
+        "output": result.stdout,
+        "error": result.stderr.strip().split("\n")[-1] if result.stderr else "",
+        "line": re.findall("line \d+", result.stderr)[-1].split(" ")[1] if result.stderr else ""
+    }
 
 def execute_code(code: str, call: str):
     full_code = code + f"\n\nprint({call})\n"
