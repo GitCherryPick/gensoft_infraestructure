@@ -7,6 +7,8 @@ from app.api import code_tasks
 from app.api import submissions
 from app.api import ai_feedback_router
 from app.api import replication_submissions
+from app.api import exam 
+
 from app.database import engine
 from app.model.base import Base
 from app.seed import seed_task_replicators, seed_task_lab
@@ -41,3 +43,4 @@ app.include_router(code_tasks.router, tags=["code_replicator"])
 app.include_router(submissions.router, tags=["submissions"])
 app.include_router(ai_feedback_router.router, tags=["ai-feedback"])
 app.include_router(replication_submissions.router, tags=["replication-submissions"])
+app.include_router(exam.router, tags=["exams"])
