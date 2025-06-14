@@ -17,6 +17,7 @@ class Tasks(Base):
     id_docente = Column(Integer, nullable=True)
     codigo_plantilla=Column(Text, nullable=True)
     lineas_visibles=Column(JSON, nullable=True)
+    lines_blocked = Column(JSON, nullable=True)
 
 
     tests = relationship("Tests", backref="task", cascade="all, delete-orphan")
