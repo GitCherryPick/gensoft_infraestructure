@@ -23,8 +23,7 @@ class TaskBase(BaseModel):
     title: str
     enunciado: str
 
-class TaskCreate(TaskBase):
-    tests: Optional[List[TestCreate]] = []
+class TaskOptionalFields(BaseModel):
     pistas: Optional[List[str]] = []
     date_limit: Optional[datetime] = None
     grade: Optional[int] = 0
@@ -32,29 +31,18 @@ class TaskCreate(TaskBase):
     id_docente: Optional[int] = 0
     codigo_plantilla: Optional[str] = ""
     lineas_visibles: Optional[List[int]] = []
+    lines_blocked: Optional[List[int]] = []
 
-class TaskOut(TaskBase):
+class TaskCreate(TaskBase, TaskOptionalFields):
+    tests: Optional[List[TestCreate]] = []
+
+class TaskOut(TaskBase, TaskOptionalFields):
     id: int
     created_at: datetime
     tests: List[Test] = []
-    pistas: Optional[List[str]] = []
-    date_limit: Optional[datetime] = None
-    grade: Optional[int] = None
-    status: Optional[str] = "Abierta"
-    id_docente: Optional[int] = 0
-    codigo_plantilla: Optional[str] = ""
-    lineas_visibles: Optional[List[int]] = []
 
     class Config:
         from_attributes = True
 
-class TaskUpdate(BaseModel):
-    title: str
-    enunciado: str
-    pistas: Optional[List[str]] = []
-    date_limit: Optional[datetime] = None
-    grade: Optional[int] = 0
-    status: Optional[str] = "Abierta"
-    id_docente: Optional[int] = None
-    codigo_plantilla: Optional[str] = ""
-    lineas_visibles: Optional[List[int]] = []
+class TaskUpdate(TaskBase, TaskOptionalFields):
+    pass
