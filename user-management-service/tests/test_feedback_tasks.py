@@ -12,7 +12,8 @@ def test_user():
         "email": "test4@example.com",
         "password": "testpassword123",
         "full_name": "Test User",
-        "status": "active"
+        "status": "active",
+        "role": "estudiante"
     }
     res = client.post("/users/", json=user_data)
     assert res.status_code == 200
