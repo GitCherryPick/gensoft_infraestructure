@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import logging
 
 from app.database import get_db
-from app.model import User
+from app.model import User, UserRoles, Role
 from app.utils.security import create_access_token, verify_password, get_password_hash
 from app.schema.token import LoginRequest, Token, TokenData
 
@@ -29,7 +29,9 @@ async def login(
         )
     
     user = db.query(User).filter(User.username == login_data.username).first()
-    
+    role = db.query(UserRoles).filter(UserRoles.user_id== user.id).first()
+    role_detail = db.query(Role).filter(Role.id == role.role_id).first()
+
     error_detail = "Credenciales inválidas"
     
     if not user:
@@ -83,7 +85,8 @@ async def login(
         "user_id": str(user.id),
         "username": user.username,
         "email": user.email,
-        "full_name": user.full_name or ""
+        "full_name": user.full_name or "",
+        "role": role_detail.name
     }
 
     response = {
