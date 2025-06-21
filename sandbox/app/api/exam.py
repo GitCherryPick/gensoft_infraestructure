@@ -7,6 +7,8 @@ from app.database import get_db
 from app.schema.exam import ExamCreate, ExamOut
 from app.schema.exam_response import ExamResponseCreate, ExamResponseOut
 
+from app.services.to_grade_exam import grade_exam
+
 router = APIRouter(tags=["exams"])
 
 @router.post("/exams", response_model=ExamOut, status_code=status.HTTP_201_CREATED)
@@ -24,10 +26,16 @@ def get_last_exam(db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se creo ningun examen")
     return db_exam
 
-@router.post("/exams/submit")
+@router.post("/grade/exam", response_model=ExamResponseOut)
 def submit_exam(responses: ExamResponseCreate, db: Session = Depends(get_db)):
-    db_response = ExamResponse(**responses.model_dump())
+    # 1. Obtener el examen
+    db_exam = db.query(Exam).filter(Exam.exam_id == responses.exam_id).first()
+    if not db_exam:
+        raise HTTPException(status_code=404, detail="No existe un examen relacionado con ")
+    exam_schema = ExamOut.model_validate(db_exam)
+    graded_response = grade_exam(exam_schema, responses)
+    db_response = ExamResponse(**graded_response.model_dump())
     db.add(db_response)
     db.commit()
     db.refresh(db_response)
-    return db_response
+    return graded_response

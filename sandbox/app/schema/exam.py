@@ -42,7 +42,7 @@ class ExamOut(ExamBase):
     exam_id: int
     created_at: datetime
 
-    class config:
+    class Config:
         from_attributes=True
 
 

@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional
 from datetime import datetime
 
 class QuestionResponse(BaseModel):
     question_id: int
     answer: Optional[str] = None
-    answers: Optional[List[str]] = None
+    answers: Optional[List[int]] = None
     code_solution: Optional[str] = None
     is_correct: Optional[bool] = None
     points_earned: Optional[float] = None
