@@ -529,9 +529,9 @@ async def create_exam(examn_data: dict):
 async def get_last_exam():
     return await call_service("sandbox", "GET", "/exams/last")
 
-@router.post("/exams/submit")
+@router.post("/grade/exam")
 async def submit_exam(response_data: dict):
-    return await call_service("sandbox", "POST", "/exams/submit", data=response_data)
+    return await call_service("sandbox", "POST", "/grade/exam", data=response_data)
 
 # ai assistance service
 @router.post("/ai/ask")
