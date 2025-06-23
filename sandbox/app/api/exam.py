@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session 
 from app.model.exam import Exam
 from app.model.exam_response import ExamResponse
-
+from datetime import datetime
 from app.database import get_db
 from app.schema.exam import ExamCreate, ExamOut
 from app.schema.exam_response import ExamResponseCreate, ExamResponseOut
@@ -24,8 +24,11 @@ def get_last_exam(db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se creo ningun examen")
     return db_exam
 
-@router.post("/exams/submit")
+@router.post("/grade/exam", response_model=ExamResponseOut)
 def submit_exam(responses: ExamResponseCreate, db: Session = Depends(get_db)):
+    db_exam = db.query(Exam).filter(Exam.exam_id == responses.exam_id).first()
+    if not db_exam:
+        raise HTTPException(status_code=404, detail="No existe un examen relacionado con ")
     db_response = ExamResponse(**responses.model_dump())
     db.add(db_response)
     db.commit()
