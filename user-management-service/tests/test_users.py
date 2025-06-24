@@ -7,7 +7,8 @@ user_data = {
     "username": "testuser3",
     "email": "testuser3@example.com",
     "password": "testpassword",
-    "full_name": "Test User"
+    "full_name": "Test User",
+    "role": "estudiante"
 }
 
 def test_basic_route():    
@@ -28,7 +29,6 @@ def test_create_user():
     assert response_data["email"] == user_data["email"]
     assert response_data["full_name"] == user_data["full_name"]
     assert "id" in response_data
-
 
 def test_delete_user():
     response = client.delete("/users/testuser3")

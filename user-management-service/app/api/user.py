@@ -67,13 +67,6 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
             detail="No existe el rol"
         )
 
-    # Consulta ORM normal
-    # roles = db.query(Role).all()
-    # print("ORM roles:", roles)
-
-    # tip = db.query(User).all()
-    # print("ORM users:", tip)
-
     try:
         db.add(db_user)
         db.commit()
@@ -100,8 +93,12 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.delete("/{user_username}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_username: str, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == user_username).first()
+    user_role = db.query(UserRoles).filter(UserRoles.user_id == user.id).first()
+    print(f"usuario: {user} and user_role {user_role}")
     if user is None:
         raise  HTTPException(status_code=404, detail="User not found")
+    db.delete(user_role)
+    db.commit()
     db.delete(user)
     db.commit()
     return None

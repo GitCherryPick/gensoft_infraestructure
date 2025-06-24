@@ -189,7 +189,6 @@ def seed_task_lab():
         task = Tasks(title=data["title"], enunciado=data["enunciado"],pistas=data.get("pistas", []))
         db.add(task)
         db.flush()  
-        # Creamos y añadimos los tests
         tests = [Tests(task_id=task.id, input=t["input"], output=t["output"]) for t in data["tests"]]
         db.add_all(tests)
 

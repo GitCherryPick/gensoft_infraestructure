@@ -520,6 +520,19 @@ async def update_replication_submission(submission_id: int, submission_data: dic
 async def delete_replication_submission(submission_id: int):
     return await call_service("sandbox", "DELETE", f"/replication-submissions/{submission_id}")
 
+# Exams Routes
+@router.post("/exams")
+async def create_exam(examn_data: dict):
+    return await call_service("sandbox", "POST", "/exams", data=examn_data)
+
+@router.get("/exams/last")
+async def get_last_exam():
+    return await call_service("sandbox", "GET", "/exams/last")
+
+@router.post("/grade/exam")
+async def submit_exam(response_data: dict):
+    return await call_service("sandbox", "POST", "/grade/exam", data=response_data)
+
 # ai assistance service
 @router.post("/ai/ask")
 async def ask_ai(question: dict):
